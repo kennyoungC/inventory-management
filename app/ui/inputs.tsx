@@ -3,7 +3,7 @@ interface InputsProps {
     name: string;
     placeholder: string;
     error: string | undefined;
-    type?: string | 'text';
+    type?: string;
     defaultValue?: string | number;
 }
 export default function Inputs({
