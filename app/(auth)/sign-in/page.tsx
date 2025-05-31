@@ -3,8 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useActionState } from 'react';
-import { signIn } from './actions';
-import Inputs from '@/app/ui/inputs';
+import Inputs from '@/app/ui/Inputs';
+import { signIn } from '@/app/lib/actions/sign-in.actions';
 
 export default function SignIn() {
     const [showPassword, setShowPassword] = useState(false);

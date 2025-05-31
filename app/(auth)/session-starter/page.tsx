@@ -1,8 +1,8 @@
 'use client';
 
+import validateSession from '@/app/lib/actions/session-starter.actions';
 import { useState, useRef } from 'react';
 import { useActionState } from 'react';
-import { validateSession } from './actions';
 
 export default function SessionStarter() {
     const [accessCode, setAccessCode] = useState<string[]>(Array(6).fill(''));

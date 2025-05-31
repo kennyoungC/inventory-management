@@ -3,8 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useActionState } from 'react';
-import { register } from './actions';
-import Inputs from '@/app/ui/inputs';
+import Inputs from '@/app/ui/Inputs';
+import { register } from '@/app/lib/actions/register.actions';
 
 export default function Register() {
     const [showPassword, setShowPassword] = useState(false);
@@ -114,7 +114,7 @@ export default function Register() {
                                 label="Confirm Password"
                                 name="confirmPassword"
                                 placeholder="Enter your password"
-                                error=''
+                                error=""
                             />
 
                             <button

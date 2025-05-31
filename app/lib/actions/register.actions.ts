@@ -1,4 +1,4 @@
-'use server';
+// 'use server';
 
 export async function register(state: unknown | null, formData: FormData) {
     const data = {

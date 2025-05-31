@@ -1,11 +1,5 @@
-interface InputsProps {
-    label: string;
-    name: string;
-    placeholder: string;
-    error: string | undefined;
-    type?: string;
-    defaultValue?: string | number;
-}
+import { InputsProps } from '../lib/types';
+
 export default function Inputs({
     label,
     name,
