@@ -1,10 +1,11 @@
-'use client';
+// 'use client';
 
 import { NavItems } from '@/app/lib/types';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 import { usePathname } from 'next/navigation';
+import { logOut } from '@/app/lib/actions/sign-in.actions';
 
 type Props = {
     isExpanded: boolean;
@@ -62,17 +63,19 @@ const NavLinks = ({ isExpanded }: Props) => {
                     </span>
                 </Link>
             ))}
-            <Link
-                href="/logout"
-                className="flex items-center px-4 py-3 mt-4 text-red-500 hover:bg-red-50 whitespace-nowrap"
+
+            <button
+                onClick={() => logOut()}
+                className="flex items-center cursor-pointer w-full px-4 py-3 text-red-500 hover:bg-red-50 whitespace-nowrap"
             >
                 <Image src="/Logout.svg" alt="Logout Icon" width={20} height={20} />
+
                 <span
                     className={`ml-3 opacity-0 ${isExpanded ? 'opacity-100' : ''} group-hover:opacity-100 transition-opacity duration-300 `}
                 >
                     Logout
                 </span>
-            </Link>
+            </button>
         </section>
     );
 };
