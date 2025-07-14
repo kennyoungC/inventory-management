@@ -7,6 +7,7 @@ export default function Inputs({
     error,
     type,
     defaultValue,
+    required,
 }: InputsProps) {
     return (
         <div>
@@ -18,9 +19,10 @@ export default function Inputs({
                     defaultValue={defaultValue}
                     className="mt-1 block w-full [appearance:textfield] rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none sm:text-sm [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                     placeholder={placeholder}
+                    required={required}
                 />{' '}
             </label>
-            {error && error.length > 0 && <p className="mt-1 ml-2 text-xs text-red-600">{error}</p>}
+            {error && <p className="mt-1 ml-2 text-xs text-red-600">{error}</p>}
         </div>
     );
 }
