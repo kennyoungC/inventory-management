@@ -8,6 +8,7 @@ export interface Restaurant extends Document {
     phone_number: number;
     access_code: number;
     password: string;
+    role: 'admin' | 'user';
 }
 
 const RestaurantSchema = new Schema<Restaurant>(
@@ -63,6 +64,12 @@ const RestaurantSchema = new Schema<Restaurant>(
             type: String,
             required: [true, 'Please provide an address for this Restaurant.'],
             trim: true,
+        },
+        role: {
+            type: String,
+            enum: ['admin', 'staff'],
+            required: true,
+            default: 'admin',
         },
     },
     {
