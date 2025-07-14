@@ -1,13 +1,49 @@
 'use client';
 
-import validateSession from '@/app/lib/actions/session-starter.actions';
-import { useState, useRef } from 'react';
+import validateSession, { requestNewStaffCode } from '@/app/lib/actions/session-starter.actions';
+import { useRouter } from 'next/navigation';
+import { useState, useRef, useEffect, FormEvent } from 'react';
 import { useActionState } from 'react';
 
 export default function SessionStarter() {
+    const router = useRouter();
     const [accessCode, setAccessCode] = useState<string[]>(Array(6).fill(''));
     const inputRefs = useRef<(HTMLInputElement | null)[]>(Array(6).fill(null));
     const [state, formAction, isPending] = useActionState(validateSession, null);
+
+    // New code request states
+    const [showRequest, setShowRequest] = useState(false);
+    const [requestEmail, setRequestEmail] = useState('');
+    const [requestMessage, setRequestMessage] = useState('');
+    const [requestError, setRequestError] = useState('');
+    const [isRequesting, setIsRequesting] = useState(false);
+
+    useEffect(() => {
+        if (state?.success) {
+            router.push('/dashboard');
+        }
+    }, [state?.success, router]);
+
+    // Handle request new code form
+    async function handleRequestNewCode(e: FormEvent) {
+        e.preventDefault();
+        setRequestMessage('');
+        setRequestError('');
+        setIsRequesting(true);
+
+        const formData = new FormData();
+        formData.append('email', requestEmail);
+
+        const res = await requestNewStaffCode(null, formData);
+        setIsRequesting(false);
+
+        if (res?.error) setRequestError(res.error);
+        else {
+            setRequestMessage(res.message || 'A new code has been sent.');
+            setRequestEmail('');
+            setAccessCode(Array(6).fill(''));
+        }
+    }
 
     const handleChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -24,6 +60,10 @@ export default function SessionStarter() {
         // Auto-focus next input if a digit was entered
         if (digit && index < 5) {
             inputRefs.current[index + 1]?.focus();
+        }
+
+        if (newAccessCode.every(char => char !== '')) {
+            setShowRequest(false);
         }
     };
 
@@ -98,13 +138,55 @@ export default function SessionStarter() {
                             </button>
                         </div>
                     </form>
-                    <div className="text-center">
-                        <a
-                            href="#"
-                            className="text-xs text-blue-600 hover:text-blue-700 hover:underline transition-colors duration-200"
-                        >
-                            Need help accessing your account?
-                        </a>
+
+                    <div className="text-center mt-4">
+                        {!showRequest && state?.error && state.type === 'expired' && (
+                            <a
+                                href="#"
+                                className="text-xs text-blue-600 hover:text-blue-700 hover:underline transition-colors duration-200"
+                                onClick={e => {
+                                    e.preventDefault();
+                                    setShowRequest(true);
+                                }}
+                            >
+                                Request a new code
+                            </a>
+                        )}
+
+                        {showRequest && (
+                            <form onSubmit={handleRequestNewCode} className="mt-2">
+                                <input
+                                    type="email"
+                                    placeholder="Your staff email"
+                                    value={requestEmail}
+                                    onChange={e => setRequestEmail(e.target.value)}
+                                    required
+                                    className="w-full mb-2 px-3 py-2 border rounded"
+                                />
+                                <button
+                                    type="submit"
+                                    disabled={isRequesting}
+                                    className="w-full py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                >
+                                    {isRequesting ? 'Sending...' : 'Send Code'}
+                                </button>
+                                {requestMessage && (
+                                    <div className="text-green-600 text-xs mt-2">
+                                        {requestMessage}
+                                    </div>
+                                )}
+                                {requestError && (
+                                    <div className="text-red-600 text-xs mt-2">{requestError}</div>
+                                )}
+                                <button
+                                    type="button"
+                                    onClick={() => setShowRequest(false)}
+                                    className="block text-xs text-gray-500 mt-2 underline"
+                                >
+                                    Cancel
+                                </button>
+                            </form>
+                        )}
                     </div>
                 </div>
             </div>

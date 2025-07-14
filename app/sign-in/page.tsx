@@ -4,11 +4,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useActionState } from 'react';
 import Inputs from '@/app/ui/Inputs';
-import { signIn } from '@/app/lib/actions/sign-in.actions';
+import { logIn } from '@/app/lib/actions/sign-in.actions';
 
 export default function SignIn() {
     const [showPassword, setShowPassword] = useState(false);
-    const [state, formAction, isPending] = useActionState(signIn, null);
+    const [state, formAction, isPending] = useActionState(logIn, undefined);
 
     return (
         <div className="flex h-screen">
@@ -45,10 +45,11 @@ export default function SignIn() {
                     <form action={formAction}>
                         <div className="mb-6">
                             <Inputs
+                                type="email"
                                 label="Email"
                                 name="email"
                                 placeholder="Enter your email or username"
-                                error={state?.email as string}
+                                required
                             />
                         </div>
                         <div className="mb-6">
@@ -58,7 +59,8 @@ export default function SignIn() {
                                     label="Password"
                                     name="password"
                                     placeholder="Enter your password"
-                                    error={state?.password as string}
+                                    required
+                                    error={state?.message}
                                 />
 
                                 <button
@@ -97,7 +99,7 @@ export default function SignIn() {
                         <p className="text-gray-600">
                             {`Don't have an account?`}{' '}
                             <Link
-                                href="/"
+                                href="/register"
                                 className="font-medium text-blue-600 hover:text-blue-700"
                             >
                                 Register

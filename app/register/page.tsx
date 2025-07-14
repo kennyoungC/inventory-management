@@ -2,13 +2,21 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState, useActionState } from 'react';
+import { useState, useActionState, useEffect } from 'react';
 import Inputs from '@/app/ui/Inputs';
-import { register } from '@/app/lib/actions/register.actions';
+import { createRestaurant } from '@/app/lib/actions/restaurant.action';
+import { useRouter } from 'next/navigation';
 
 export default function Register() {
     const [showPassword, setShowPassword] = useState(false);
-    const [state, formAction, isPending] = useActionState(register, null);
+    const router = useRouter();
+    const [state, formAction, isPending] = useActionState(createRestaurant, null);
+
+    useEffect(() => {
+        if (state?.success && state?.values?.email) {
+            router.push(`/sign-in?email=${encodeURIComponent(state.values.email)}`);
+        }
+    }, [state, router]);
 
     return (
         <div className="flex h-screen">
@@ -51,33 +59,49 @@ export default function Register() {
                                 label="Restaurant Name"
                                 name="restaurantName"
                                 placeholder="Enter your restaurant name"
-                                error={state?.restaurantName as string}
+                                error={state?.errors?.restaurantName?.[0]}
+                                defaultValue={state?.values?.restaurantName}
                             />
                         </div>
                         <div className="mb-6">
                             <Inputs
+                                type="email"
                                 label="Email Address"
                                 name="email"
                                 placeholder="Enter your email address"
-                                error={state?.email as string}
+                                error={state?.errors?.email?.[0]}
+                                defaultValue={state?.values?.email}
                             />
                         </div>
                         <div className="mb-6">
                             <Inputs
+                                type="number"
                                 label="Phone Number"
                                 name="phoneNumber"
                                 placeholder="Enter your phone number"
-                                error={state?.phoneNumber as string}
+                                error={state?.errors?.phoneNumber?.[0]}
+                                defaultValue={state?.values?.phoneNumber}
+                            />
+                        </div>
+                        <div className="mb-6">
+                            <Inputs
+                                label="Address"
+                                name="address"
+                                placeholder="Enter your restaurant address"
+                                error={state?.errors?.address?.[0]}
+                                defaultValue={state?.values?.address}
                             />
                         </div>
 
                         {/* Access Code */}
                         <div className="mb-6">
                             <Inputs
+                                type="number"
                                 label="Quick Access Code"
                                 name="accessCode"
                                 placeholder="Enter your quick access code"
-                                error={state?.accessCode as string}
+                                error={state?.errors?.accessCode?.[0]}
+                                defaultValue={state?.values?.accessCode}
                             />
                             <p className="mt-1 text-xs text-gray-500">
                                 Set a 6-digit code for quick access to your restaurant management
@@ -91,7 +115,8 @@ export default function Register() {
                                 label="Password"
                                 name="password"
                                 placeholder="Enter your password"
-                                error={state?.password as string}
+                                error={state?.errors?.password?.[0]}
+                                defaultValue={state?.values?.password}
                             />
 
                             <button
@@ -114,7 +139,8 @@ export default function Register() {
                                 label="Confirm Password"
                                 name="confirmPassword"
                                 placeholder="Enter your password"
-                                error=""
+                                error={state?.errors?.confirmPassword?.[0]}
+                                defaultValue={state?.values?.confirmPassword}
                             />
 
                             <button
@@ -170,7 +196,7 @@ export default function Register() {
                         <p className="text-sm text-gray-600">
                             Already have an account?{' '}
                             <Link
-                                href="/signIn"
+                                href="/sign-in"
                                 className="font-medium text-blue-600 hover:text-blue-700"
                             >
                                 Sign In

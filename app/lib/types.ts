@@ -8,7 +8,8 @@ export type InputsProps = {
     label: string;
     name: string;
     placeholder: string;
-    error: string | undefined;
+    error?: string;
     type?: string;
-    defaultValue?: string | number;
+    defaultValue?: string;
+    required?: boolean;
 };
