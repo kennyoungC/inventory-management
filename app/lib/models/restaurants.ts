@@ -8,7 +8,7 @@ export interface Restaurant extends Document {
     phone_number: number;
     access_code: number;
     password: string;
-    role: 'admin' | 'user';
+    role: 'admin' | 'staff';
 }
 
 const RestaurantSchema = new Schema<Restaurant>(
