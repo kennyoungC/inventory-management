@@ -7,7 +7,7 @@ export async function sendAccessCodeEmail(email: string, code: number, expires: 
 
     try {
         const { data, error } = await resend.emails.send({
-            from: 'Your Restaurant <myrestuarant@kareem-kb.tech>',
+            from: 'Your Restaurant <myrestuarant@kennethobi.software>',
             to: [email],
             subject: 'Your Staff Access Code',
             html: `
