@@ -13,3 +13,14 @@ export type InputsProps = {
     defaultValue?: string;
     required?: boolean;
 };
+
+export type StaffModel = {
+    id: string;
+    restaurantId: string;
+    fullName: string;
+    jobTitle: string;
+    isActive: boolean;
+    email: string;
+    lastLoginAt: string;
+    role?: string;
+};
