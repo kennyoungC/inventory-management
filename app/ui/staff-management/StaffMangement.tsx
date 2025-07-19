@@ -1,24 +1,14 @@
 'use client';
 
-import React, { useState } from 'react';
-import StaffCard from '../components/Staff/StaffCard';
+import React, { useMemo, useState } from 'react';
+import StaffCard from './StaffCard';
 import { FaPlus, FaUser } from 'react-icons/fa';
-import StaffDetails from '../components/Staff/StaffDetails';
-import CreateNewStaff from '../components/Staff/CreateNewStaff';
-
-type Staff = {
-    id: string;
-    restaurantId: string;
-    fullName: string;
-    jobTitle: string;
-    isActive: boolean;
-    email: string;
-    lastLoginAt: string;
-    role?: string;
-};
+import StaffDetails from './StaffDetails';
+import CreateNewStaff from './CreateNewStaff';
+import type { StaffModel } from '@/app/lib/types';
 
 type Props = {
-    staffList: Staff[];
+    staffList: StaffModel[];
 };
 
 const StaffMangement = ({ staffList }: Props) => {
@@ -26,41 +16,11 @@ const StaffMangement = ({ staffList }: Props) => {
     const [showAddStaffForm, setShowAddStaffForm] = useState(false);
     const [selectedStaff, setSelectedStaff] = useState<string | null>(null);
     const [showStaffDetails, setShowStaffDetails] = useState(false);
-    // const [showEditStaffForm, setShowEditStaffForm] = useState(false);
 
-    // const [editFormData, setEditFormData] = useState({
-    //     name: '',
-    //     title: '',
-    //     email: '',
-    //     role: 'staff',
-    // });
+    const selectedStaffDetails = useMemo(() => {
+        return selectedStaff ? staffList.find(staff => staff.id === selectedStaff) : null;
+    }, [selectedStaff, staffList]);
 
-    // const handleEditFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    //     const { name, value } = e.target;
-    //     setEditFormData(prev => ({
-    //         ...prev,
-    //         [name]: value,
-    //     }));
-    // };
-
-    // const handleEditStaff = (e: React.FormEvent) => {
-    //     e.preventDefault();
-    //     if (selectedStaff) {
-    //         setStaffList(prevStaff =>
-    //             prevStaff.map(staff =>
-    //                 staff.id === selectedStaff ? { ...staff, ...editFormData } : staff,
-    //             ),
-    //         );
-    //     }
-    //     setShowEditStaffForm(false);
-    // };
-
-    const selectedStaffDetails = selectedStaff
-        ? staffList.find(staff => staff.id === selectedStaff)
-        : null;
-    const handleSendPasswordReset = () => {
-        alert(`Password reset link sent to ${selectedStaffDetails?.email}`);
-    };
     const handleEditClick = () => {
         if (selectedStaffDetails) {
             // setShowEditStaffForm(true);
@@ -135,106 +95,12 @@ const StaffMangement = ({ staffList }: Props) => {
                         <StaffDetails
                             selectedStaffDetails={selectedStaffDetails}
                             handleEditClick={handleEditClick}
-                            handleSendPasswordReset={handleSendPasswordReset}
                             setShowStaffDetails={setShowStaffDetails}
                         />
                     )}
                 </div>
             </div>
             {showAddStaffForm && <CreateNewStaff setShowAddStaffForm={setShowAddStaffForm} />}
-            {/* {showEditStaffForm && selectedStaffDetails && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
-                        <div className="p-6 border-b border-gray-100">
-                            <div className="flex items-center justify-between">
-                                <h2 className="text-xl font-bold text-gray-800">
-                                    Edit Staff Details
-                                </h2>
-                                <button
-                                    onClick={() => setShowEditStaffForm(false)}
-                                    className="text-gray-400 hover:text-gray-600 transition-colors duration-200 cursor-pointer"
-                                >
-                                    <FaTimes color="grey" />
-                                </button>
-                            </div>
-                        </div>
-                        <form onSubmit={handleEditStaff} className="p-6 space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Full Name
-                                </label>
-                                <input
-                                    type="text"
-                                    name="name"
-                                    value={editFormData.name}
-                                    onChange={handleEditFormChange}
-                                    placeholder="Enter staff name"
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Job Title
-                                </label>
-                                <input
-                                    type="text"
-                                    name="title"
-                                    value={editFormData.title}
-                                    onChange={handleEditFormChange}
-                                    placeholder="Enter job title"
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Email
-                                </label>
-                                <input
-                                    type="email"
-                                    name="email"
-                                    value={editFormData.email}
-                                    onChange={handleEditFormChange}
-                                    placeholder="Enter email address"
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Role Access
-                                </label>
-                                <select
-                                    name="role"
-                                    value={editFormData.role}
-                                    onChange={handleEditFormChange}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    required
-                                >
-                                    <option value="staff">Staff</option>
-                                    <option value="admin">Admin</option>
-                                </select>
-                            </div>
-                            <div className="pt-4 flex justify-end gap-4">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowEditStaffForm(false)}
-                                    className="px-6 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors duration-200 !rounded-button whitespace-nowrap cursor-pointer"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 !rounded-button whitespace-nowrap cursor-pointer"
-                                >
-                                    Save Changes
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )} */}
         </div>
     );
 };
