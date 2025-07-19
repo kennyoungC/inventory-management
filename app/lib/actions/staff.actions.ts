@@ -7,6 +7,7 @@ import Staff from '../models/staffs';
 import { z } from 'zod';
 import { auth } from '@/auth';
 import { MongoDuplicateError } from './restaurant.action';
+import { revalidatePath } from 'next/cache';
 
 export type State = {
     errors?: {
@@ -21,14 +22,6 @@ export type State = {
         email: string;
         jobTitle: string;
         fullName: string;
-    };
-    data?: {
-        id: string;
-        restaurantId: string;
-        fullName: string;
-        jobTitle: string;
-        email: string;
-        isActive: boolean; // Optional, can be set to true by default
     };
 } | null;
 
@@ -77,7 +70,7 @@ export async function addNewStaff(prevState: State, formData: FormData): Promise
     const expires = new Date(Date.now() + 60 * 60 * 1000);
 
     try {
-        const newStaff = await Staff.create({
+        await Staff.create({
             email,
             access_code: code,
             code_expires_at: expires,
@@ -88,19 +81,9 @@ export async function addNewStaff(prevState: State, formData: FormData): Promise
         });
 
         await sendAccessCodeEmail(email, code, expires);
-        console.log('newStaff', newStaff);
 
-        return {
-            success: true,
-            data: {
-                id: newStaff._id.toString(),
-                restaurantId: newStaff.restaurant_id.toString(),
-                fullName: newStaff.full_name,
-                jobTitle: newStaff.job_title,
-                email: newStaff.email,
-                isActive: newStaff.is_active,
-            },
-        };
+        revalidatePath('/dashboard/staff-management');
+        return { success: true, message: 'Staff added successfully' };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
         if (error instanceof Error) {

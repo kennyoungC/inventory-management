@@ -5,40 +5,29 @@ import { FaTimes } from 'react-icons/fa';
 import Inputs from '../../Inputs';
 import { addNewStaff } from '@/app/lib/actions/staff.actions';
 
-type Staff = {
-    id: string;
-    restaurantId: string;
-    fullName: string;
-    jobTitle: string;
-    isActive: boolean;
-    email: string;
-    lastLoginAt: string;
-    role?: string;
-};
+// type Staff = {
+//     id: string;
+//     restaurantId: string;
+//     fullName: string;
+//     jobTitle: string;
+//     isActive: boolean;
+//     email: string;
+//     lastLoginAt: string;
+//     role?: string;
+// };
 
 type Props = {
     setShowAddStaffForm: (show: boolean) => void;
-    onStaffAdded?: (newStaff: Staff) => void; // Optional callback for when a new staff is added
 };
 
-const CreateNewStaff = ({ setShowAddStaffForm, onStaffAdded }: Props) => {
+const CreateNewStaff = ({ setShowAddStaffForm }: Props) => {
     const [state, formAction, isPending] = useActionState(addNewStaff, null);
 
     useEffect(() => {
-        if (state?.success && onStaffAdded) {
-            if (!state.data) return;
+        if (state?.success) {
             setShowAddStaffForm(false);
-            onStaffAdded({
-                id: state.data.id,
-                restaurantId: state.data.restaurantId,
-                fullName: state.data.fullName,
-                jobTitle: state.data.jobTitle,
-                isActive: state.data.isActive,
-                email: state.data.email,
-                lastLoginAt: new Date().toISOString(),
-            });
         }
-    }, [state?.success, setShowAddStaffForm, onStaffAdded, state?.data]);
+    }, [state?.success]);
 
     return (
         <div className="fixed inset-0 backdrop-brightness-70 flex items-center justify-center z-50">
