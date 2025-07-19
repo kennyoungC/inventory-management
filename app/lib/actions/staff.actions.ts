@@ -111,3 +111,82 @@ export async function addNewStaff(prevState: State, formData: FormData): Promise
         };
     }
 }
+
+export async function deleteStaff(staffId: string): Promise<State> {
+    const session = await auth();
+
+    if (!session?.user?.id) {
+        return {
+            errors: { general: ['You must be logged in to delete staff. Please Refresh Page'] },
+            message: 'Authentication required',
+        };
+    }
+
+    await dbConnect();
+
+    try {
+        const result = await Staff.deleteOne({ _id: staffId, restaurant_id: session.user.id });
+
+        console.log(`Delete result: ${JSON.stringify(result)}`);
+
+        if (result.deletedCount === 0) {
+            return {
+                errors: { general: ['Staff not found or you do not have permission to delete.'] },
+                message: 'Staff not found',
+            };
+        }
+
+        revalidatePath('/dashboard/staff-management');
+        return { success: true, message: 'Staff deleted successfully' };
+    } catch (error) {
+        console.error('Error deleting staff:', error);
+        return {
+            errors: { general: ['Failed to delete staff. Please try again later.'] },
+            message: 'Failed to delete staff',
+        };
+    }
+}
+
+export async function resetAccessCode(staffId: string): Promise<State> {
+    const session = await auth();
+
+    if (!session?.user?.id) {
+        return {
+            errors: {
+                general: ['You must be logged in to reset access code. Please Refresh Page'],
+            },
+            message: 'Authentication required',
+        };
+    }
+
+    await dbConnect();
+
+    try {
+        const code = await generateUniqueCode();
+        const expires = new Date(Date.now() + 60 * 60 * 1000);
+
+        const staff = await Staff.findOneAndUpdate(
+            { _id: staffId, restaurant_id: session.user.id },
+            { access_code: code, code_expires_at: expires },
+            { new: true },
+        );
+
+        if (!staff) {
+            return {
+                errors: { general: ['Staff not found or you do not have permission to reset.'] },
+                message: 'Staff not found',
+            };
+        }
+
+        await sendAccessCodeEmail(staff.email, code, expires);
+
+        revalidatePath('/dashboard/staff-management');
+        return { success: true, message: 'Access code reset successfully' };
+    } catch (error) {
+        console.error('Error resetting access code:', error);
+        return {
+            errors: { general: ['Failed to reset access code. Please try again later.'] },
+            message: 'Failed to reset access code',
+        };
+    }
+}
