@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import StaffCard from '../components/Staff/StaffCard';
-import { FaPlus, FaTimes, FaUser, FaUserShield } from 'react-icons/fa';
+import { FaPlus, FaUser } from 'react-icons/fa';
 import StaffDetails from '../components/Staff/StaffDetails';
 import CreateNewStaff from '../components/Staff/CreateNewStaff';
 
@@ -21,14 +21,12 @@ type Props = {
     staffList: Staff[];
 };
 
-const StaffMangement = ({ staffList: initialStaffList }: Props) => {
-    const [staffList, setStaffList] = useState<Staff[]>(initialStaffList);
-
+const StaffMangement = ({ staffList }: Props) => {
     const [selectedRole, setSelectedRole] = useState('all');
     const [showAddStaffForm, setShowAddStaffForm] = useState(false);
     const [selectedStaff, setSelectedStaff] = useState<string | null>(null);
     const [showStaffDetails, setShowStaffDetails] = useState(false);
-    const [showEditStaffForm, setShowEditStaffForm] = useState(false);
+    // const [showEditStaffForm, setShowEditStaffForm] = useState(false);
 
     // const [editFormData, setEditFormData] = useState({
     //     name: '',
@@ -57,10 +55,6 @@ const StaffMangement = ({ staffList: initialStaffList }: Props) => {
     //     setShowEditStaffForm(false);
     // };
 
-    const handleAddStaff = (newStaff: Staff) => {
-        setStaffList(prev => [...prev, newStaff]);
-        setShowAddStaffForm(false);
-    };
     const selectedStaffDetails = selectedStaff
         ? staffList.find(staff => staff.id === selectedStaff)
         : null;
@@ -69,13 +63,7 @@ const StaffMangement = ({ staffList: initialStaffList }: Props) => {
     };
     const handleEditClick = () => {
         if (selectedStaffDetails) {
-            setEditFormData({
-                name: selectedStaffDetails.fullName,
-                title: selectedStaffDetails.jobTitle,
-                email: selectedStaffDetails.email,
-                role: selectedStaffDetails.role,
-            });
-            setShowEditStaffForm(true);
+            // setShowEditStaffForm(true);
         }
     };
 
@@ -153,12 +141,7 @@ const StaffMangement = ({ staffList: initialStaffList }: Props) => {
                     )}
                 </div>
             </div>
-            {showAddStaffForm && (
-                <CreateNewStaff
-                    onStaffAdded={handleAddStaff}
-                    setShowAddStaffForm={setShowAddStaffForm}
-                />
-            )}
+            {showAddStaffForm && <CreateNewStaff setShowAddStaffForm={setShowAddStaffForm} />}
             {/* {showEditStaffForm && selectedStaffDetails && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
