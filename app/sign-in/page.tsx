@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useActionState } from 'react';
-import Inputs from '@/app/ui/Inputs';
+import Inputs from '@/app/ui/components/Inputs/Inputs';
 import { logIn } from '@/app/lib/actions/sign-in.actions';
 
 export default function SignIn() {
@@ -12,7 +12,6 @@ export default function SignIn() {
 
     return (
         <div className="flex h-screen">
-            {/* Left Section (Branding) - Hidden on mobile */}
             <div className="hidden md:flex w-1/2 relative">
                 <div className="absolute inset-0">
                     <Image
@@ -24,7 +23,7 @@ export default function SignIn() {
                         priority
                     />
                 </div>
-                {/* fix here  */}
+
                 <div className="relative z-10 text-center  justify-center items-center">
                     <h2 className="text-4xl font-bold text-white mb-4 drop-shadow-lg">
                         Welcome to FoodStock
@@ -34,7 +33,6 @@ export default function SignIn() {
                     </p>
                 </div>
             </div>
-            {/* Right Section (Login Form) */}
             <div className="w-full md:w-1/2 h-screen overflow-y-auto bg-white">
                 <div className="max-w-xl mx-auto p-8">
                     <div className="text-center mb-8">
