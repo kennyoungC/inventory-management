@@ -6,18 +6,24 @@ import { StaffModel } from '@/app/lib/types';
 
 type Props = {
     selectedStaffDetails: StaffModel;
-    setShowStaffDetails: (show: boolean) => void;
+    onCloseStaffDetails: () => void;
     handleEditClick: () => void;
+    onDelete: (staffId: string) => void;
 };
 
-const StaffDetails = ({ selectedStaffDetails, setShowStaffDetails, handleEditClick }: Props) => {
+const StaffDetails = ({
+    selectedStaffDetails,
+    onCloseStaffDetails,
+    handleEditClick,
+    onDelete,
+}: Props) => {
     return (
-        <div className="fixed right-0 top-0 h-screen w-[400px] bg-white shadow-xl overflow-y-auto transform transition-transform duration-300">
+        <div className="fixed right-0 top-0 h-screen w-[400px] bg-white shadow-xl overflow-y-auto transform transition-transform duration-300 z-30">
             <div className="sticky top-0 bg-white z-10 border-b border-gray-100">
                 <div className="flex items-center justify-between p-6">
                     <h2 className="text-xl font-bold text-gray-800">Staff Details</h2>
                     <button
-                        onClick={() => setShowStaffDetails(false)}
+                        onClick={onCloseStaffDetails}
                         className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
                     >
                         <FaTimes size={32} className="cursor-pointer" color="gray" />
@@ -87,10 +93,7 @@ const StaffDetails = ({ selectedStaffDetails, setShowStaffDetails, handleEditCli
                             <span>Edit Staff Details</span>
                         </button>
                         <ResetButton staffId={selectedStaffDetails.id} />
-                        <DeleteStaffButton
-                            staffId={selectedStaffDetails.id}
-                            setShowStaffDetails={setShowStaffDetails}
-                        />
+                        <DeleteStaffButton onDelete={() => onDelete(selectedStaffDetails.id)} />
                     </div>
                 </div>
             </div>
