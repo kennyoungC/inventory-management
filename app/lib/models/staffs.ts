@@ -1,7 +1,7 @@
 import { Schema, model, models, Document } from 'mongoose';
 import validator from 'validator';
 
-export interface Staff extends Document {
+export interface StaffDto extends Document {
     restaurant_id: Schema.Types.ObjectId;
     full_name: string;
     email: string;
@@ -11,7 +11,7 @@ export interface Staff extends Document {
     is_active: boolean;
     last_login_at?: Date;
 }
-const StaffSchema = new Schema<Staff>(
+const StaffSchema = new Schema<StaffDto>(
     {
         restaurant_id: {
             type: Schema.Types.ObjectId,
@@ -57,5 +57,5 @@ const StaffSchema = new Schema<Staff>(
     },
 );
 
-const Staff = models.Staff || model<Staff>('Staff', StaffSchema);
+const Staff = models.Staff || model<StaffDto>('Staff', StaffSchema);
 export default Staff;
