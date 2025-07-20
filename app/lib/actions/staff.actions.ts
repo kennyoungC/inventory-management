@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { auth } from '@/auth';
 import { MongoDuplicateError } from './restaurant.action';
 import { revalidatePath } from 'next/cache';
+import { StaffModel } from '../types';
 
 export type State = {
     errors?: {
@@ -185,5 +186,57 @@ export async function resetAccessCode(staffId: string): Promise<State> {
             errors: { general: ['Failed to reset access code. Please try again later.'] },
             message: 'Failed to reset access code',
         };
+    }
+}
+
+export async function getAllStaff(): Promise<StaffModel[]> {
+    try {
+        await dbConnect();
+
+        const session = await auth();
+        const restaurantId = session?.user?.id;
+
+        if (!restaurantId) {
+            throw new Error('Unauthorized: No restaurant session found.');
+        }
+
+        const staffList = await Staff.find({ restaurant_id: restaurantId })
+            .select({
+                _id: 1,
+                restaurant_id: 1,
+                full_name: 1,
+                job_title: 1,
+                is_active: 1,
+                email: 1,
+                last_login_at: 1,
+            })
+            .lean<
+                {
+                    _id: string;
+                    restaurant_id: string;
+                    full_name: string;
+                    job_title: string;
+                    is_active: boolean;
+                    email: string;
+                    last_login_at: Date | string | null;
+                }[]
+            >();
+
+        return staffList.map(staff => ({
+            id: staff._id?.toString() ?? '',
+            restaurantId: staff.restaurant_id?.toString() ?? '',
+            fullName: staff.full_name,
+            jobTitle: staff.job_title,
+            isActive: staff.is_active,
+            email: staff.email,
+            lastLoginAt: staff.last_login_at
+                ? staff.last_login_at instanceof Date
+                    ? staff.last_login_at.toISOString()
+                    : String(staff.last_login_at)
+                : undefined,
+        }));
+    } catch (error) {
+        console.error('Error in getAllStaff:', error);
+        return [];
     }
 }
