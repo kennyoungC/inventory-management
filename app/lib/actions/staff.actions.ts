@@ -127,16 +127,13 @@ export async function deleteStaff(staffId: string): Promise<State> {
     try {
         const result = await Staff.deleteOne({ _id: staffId, restaurant_id: session.user.id });
 
-        console.log(`Delete result: ${JSON.stringify(result)}`);
-
-        if (result.deletedCount === 0) {
+        if (!result.acknowledged || result.deletedCount === 0) {
             return {
                 errors: { general: ['Staff not found or you do not have permission to delete.'] },
                 message: 'Staff not found',
             };
         }
 
-        revalidatePath('/dashboard/staff-management');
         return { success: true, message: 'Staff deleted successfully' };
     } catch (error) {
         console.error('Error deleting staff:', error);
