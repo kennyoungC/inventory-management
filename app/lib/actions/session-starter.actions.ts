@@ -11,7 +11,6 @@ import { sendAccessCodeEmail } from '@/app/utils/sendAccessCodeEmail';
 export default async function validateSession(state: unknown | null, formData: FormData) {
     const code = formData.get('code')?.toString() || '';
 
-    // 1. Validate code format
     if (!/^\d{6}$/.test(code)) {
         return { error: 'Please enter a valid 6-digit code' };
     }
@@ -55,7 +54,7 @@ export async function requestNewStaffCode(state: unknown | null, formData: FormD
     if (!staff) return { error: 'Staff not found.' };
 
     const code = await generateUniqueCode();
-    const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+    const expires = new Date(Date.now() + 60 * 60 * 1000);
 
     staff.access_code = code;
     staff.code_expires_at = expires;
@@ -66,7 +65,7 @@ export async function requestNewStaffCode(state: unknown | null, formData: FormD
 
     return { success: true, message: 'A new code has been sent to your email.' };
 }
-//end session-starter.actions.ts
+
 export async function endSession() {
     await clearCodeSession();
     redirect('/session-starter');
