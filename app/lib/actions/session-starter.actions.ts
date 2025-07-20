@@ -18,7 +18,6 @@ export default async function validateSession(state: unknown | null, formData: F
 
     await dbConnect();
 
-    // 2. Try to find staff with this code
     const staff = await Staff.findOne({ access_code: code });
     if (staff) {
         if (staff.is_active) {
@@ -38,14 +37,12 @@ export default async function validateSession(state: unknown | null, formData: F
         return { success: true, type: 'staff', name: staff.full_name };
     }
 
-    // 3. Try to find restaurant (admin) with this code
     const restaurant = await Restaurant.findOne({ access_code: code });
     if (restaurant) {
         await setCodeSession('admin', restaurant._id.toString());
         return { success: true, type: 'admin', name: restaurant.restaurant_name };
     }
 
-    // 4. If not found, return error
     return { error: 'Invalid code or code not found' };
 }
 
