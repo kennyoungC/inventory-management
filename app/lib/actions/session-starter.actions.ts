@@ -7,12 +7,25 @@ import Staff from '../models/staffs';
 import { clearCodeSession, setCodeSession } from '../session';
 import { generateUniqueCode } from '@/app/utils/generateCode';
 import { sendAccessCodeEmail } from '@/app/utils/sendAccessCodeEmail';
+import { z } from 'zod';
+import { auth } from '@/auth';
+
+type State = {
+    error?: string;
+    success?: boolean;
+    message?: string;
+} | null;
+
+const AccessCodeSchema = z.object({
+    code: z.string().regex(/^\d{6}$/, 'Code must be exactly 6 digits'),
+});
 
 export default async function validateSession(state: unknown | null, formData: FormData) {
     const code = formData.get('code')?.toString() || '';
 
-    if (!/^\d{6}$/.test(code)) {
-        return { error: 'Please enter a valid 6-digit code' };
+    const validate = AccessCodeSchema.safeParse({ code });
+    if (!validate.success) {
+        return { error: 'Invalid code format. Please enter a 6-digit code.' };
     }
 
     await dbConnect();
@@ -69,4 +82,41 @@ export async function requestNewStaffCode(state: unknown | null, formData: FormD
 export async function endSession() {
     await clearCodeSession();
     redirect('/session-starter');
+}
+
+export async function updateAccessCode(_prevState: State, formData: FormData): Promise<State> {
+    const code = (formData.get('code') ?? '') as string;
+
+    const validate = AccessCodeSchema.safeParse({ code });
+    if (!validate.success) {
+        return {
+            error: validate.error.errors[0]?.message || 'Invalid access code.',
+            message: 'Invalid access code.',
+        };
+    }
+
+    await dbConnect();
+    const session = await auth();
+    const restaurantId = session?.user?.id;
+    if (!restaurantId) {
+        return { error: 'Not authorized', message: 'Not authorized' };
+    }
+
+    // (Optional) Forbid reusing the old code
+    const restaurant = await Restaurant.findById(restaurantId);
+
+    console.log('Updating access code for restaurant:', restaurant);
+    console.log('Updating access code for code:', code);
+
+    if (restaurant.access_code === Number(code)) {
+        return { error: 'Old Access Code Detected.', message: 'Previous Access Code Detected.' };
+    }
+
+    restaurant.access_code = Number(code);
+    await restaurant.save();
+
+    return {
+        success: true,
+        message: 'Quick Access Code updated successfully!',
+    };
 }
