@@ -4,7 +4,7 @@ export type NavItems = {
     icon: string;
 };
 
-export type InputsProps = {
+export interface InputsProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label: string;
     name: string;
     placeholder: string;
@@ -12,7 +12,8 @@ export type InputsProps = {
     type?: string;
     defaultValue?: string;
     required?: boolean;
-};
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
 
 export type StaffModel = {
     id: string;
@@ -21,6 +22,16 @@ export type StaffModel = {
     jobTitle: string;
     isActive: boolean;
     email: string;
-    lastLoginAt: string;
+    lastLoginAt?: string;
     role?: string;
+};
+
+export type RestaurantModel = {
+    id: string;
+    restaurantName: string;
+    email: string;
+    phoneNumber: string;
+    accessCode: string;
+    address?: string;
+    emailUpdates?: boolean;
 };
