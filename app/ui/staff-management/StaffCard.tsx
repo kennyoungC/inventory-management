@@ -1,15 +1,9 @@
+import { StaffModel } from '@/app/lib/types';
 import { formatDate } from '@/app/utils/formatDate';
-import React from 'react';
 import { FaClock, FaEnvelope } from 'react-icons/fa';
 
 type Prop = {
-    staff: {
-        fullName: string;
-        jobTitle: string;
-        email: string;
-        lastLoginAt: string;
-        role?: string | undefined;
-    };
+    staff: StaffModel;
 };
 
 const StaffCard = ({ staff }: Prop) => {

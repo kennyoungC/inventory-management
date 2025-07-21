@@ -1,44 +1,27 @@
 'use client';
 
-import React, { useActionState, useEffect } from 'react';
+import { useActionState, useEffect } from 'react';
 import { FaTimes } from 'react-icons/fa';
-import Inputs from '../../Inputs';
+import Inputs from '@/app/ui/components/Inputs/Inputs';
 import { addNewStaff } from '@/app/lib/actions/staff.actions';
-
-type Staff = {
-    id: string;
-    restaurantId: string;
-    fullName: string;
-    jobTitle: string;
-    isActive: boolean;
-    email: string;
-    lastLoginAt: string;
-    role?: string;
-};
+import Loader from '@/app/ui/components/Loader/Loader';
+import toast from 'react-hot-toast';
 
 type Props = {
-    setShowAddStaffForm: (show: boolean) => void;
-    onStaffAdded?: (newStaff: Staff) => void; // Optional callback for when a new staff is added
+    onCloseStaffDetails: () => void;
 };
 
-const CreateNewStaff = ({ setShowAddStaffForm, onStaffAdded }: Props) => {
+const CreateNewStaff = ({ onCloseStaffDetails }: Props) => {
     const [state, formAction, isPending] = useActionState(addNewStaff, null);
 
+    const notify = (message: string) => toast.success(message);
+
     useEffect(() => {
-        if (state?.success && onStaffAdded) {
-            if (!state.data) return;
-            setShowAddStaffForm(false);
-            onStaffAdded({
-                id: state.data.id,
-                restaurantId: state.data.restaurantId,
-                fullName: state.data.fullName,
-                jobTitle: state.data.jobTitle,
-                isActive: state.data.isActive,
-                email: state.data.email,
-                lastLoginAt: new Date().toISOString(),
-            });
+        if (state?.success && state?.message) {
+            onCloseStaffDetails();
+            notify(state?.message);
         }
-    }, [state?.success, setShowAddStaffForm, onStaffAdded, state?.data]);
+    }, [onCloseStaffDetails, state]);
 
     return (
         <div className="fixed inset-0 backdrop-brightness-70 flex items-center justify-center z-50">
@@ -46,8 +29,9 @@ const CreateNewStaff = ({ setShowAddStaffForm, onStaffAdded }: Props) => {
                 <div className="p-6 border-b border-gray-100">
                     <div className="flex items-center justify-between">
                         <h2 className="text-xl font-bold text-gray-800">Add New Staff</h2>
+
                         <button
-                            onClick={() => setShowAddStaffForm(false)}
+                            onClick={onCloseStaffDetails}
                             className="text-gray-400 hover:text-gray-600 transition-colors duration-200 cursor-pointer"
                         >
                             <FaTimes color="gray" />
@@ -96,16 +80,23 @@ const CreateNewStaff = ({ setShowAddStaffForm, onStaffAdded }: Props) => {
                     <div className="pt-4 flex justify-end gap-4">
                         <button
                             type="button"
-                            onClick={() => setShowAddStaffForm(false)}
+                            onClick={onCloseStaffDetails}
                             className="px-6 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors duration-200 !rounded-button whitespace-nowrap cursor-pointer"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
-                            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 !rounded-button whitespace-nowrap cursor-pointer"
+                            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 inline-flex !rounded-button whitespace-nowrap cursor-pointer"
                         >
-                            {isPending ? 'Adding...' : 'Add Staff'}
+                            {isPending ? (
+                                <>
+                                    <Loader />
+                                    <span>Adding Staff...</span>
+                                </>
+                            ) : (
+                                'Add Staff'
+                            )}
                         </button>
                     </div>
                 </form>

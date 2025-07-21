@@ -9,6 +9,7 @@ export interface Restaurant extends Document {
     access_code: number;
     password: string;
     role: 'admin' | 'staff';
+    email_updates?: boolean;
 }
 
 const RestaurantSchema = new Schema<Restaurant>(
@@ -70,6 +71,10 @@ const RestaurantSchema = new Schema<Restaurant>(
             enum: ['admin', 'staff'],
             required: true,
             default: 'admin',
+        },
+        email_updates: {
+            type: Boolean,
+            default: false,
         },
     },
     {

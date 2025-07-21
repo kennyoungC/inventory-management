@@ -1,34 +1,29 @@
 import { formatDate } from '@/app/utils/formatDate';
-import React from 'react';
-import { FaEnvelope, FaTimes } from 'react-icons/fa';
+import { FaEdit, FaEnvelope, FaTimes } from 'react-icons/fa';
+import DeleteStaffButton from './DeleteStaffButton';
+import ResetButton from './ResetButton';
+import { StaffModel } from '@/app/lib/types';
 
 type Props = {
-    selectedStaffDetails: {
-        fullName: string;
-        jobTitle: string;
-        email: string;
-        lastLoginAt: string;
-        isActive?: boolean;
-        role?: string | undefined;
-    };
-    setShowStaffDetails: (show: boolean) => void;
+    selectedStaffDetails: StaffModel;
+    onCloseStaffDetails: () => void;
     handleEditClick: () => void;
-    handleSendPasswordReset: () => void;
+    onDelete: (staffId: string) => void;
 };
 
 const StaffDetails = ({
     selectedStaffDetails,
-    setShowStaffDetails,
+    onCloseStaffDetails,
     handleEditClick,
-    handleSendPasswordReset,
+    onDelete,
 }: Props) => {
     return (
-        <div className="fixed right-0 top-0 h-screen w-[400px] bg-white shadow-xl overflow-y-auto transform transition-transform duration-300">
+        <div className="fixed right-0 top-0 h-screen w-[400px] bg-white shadow-xl overflow-y-auto transform transition-transform duration-300 z-30">
             <div className="sticky top-0 bg-white z-10 border-b border-gray-100">
                 <div className="flex items-center justify-between p-6">
                     <h2 className="text-xl font-bold text-gray-800">Staff Details</h2>
                     <button
-                        onClick={() => setShowStaffDetails(false)}
+                        onClick={onCloseStaffDetails}
                         className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
                     >
                         <FaTimes size={32} className="cursor-pointer" color="gray" />
@@ -89,24 +84,16 @@ const StaffDetails = ({
                     </div>
                     <div className="space-y-3">
                         <button
+                            disabled
                             id="edit-staff-details-button"
                             onClick={handleEditClick}
                             className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 !rounded-button whitespace-nowrap cursor-pointer flex items-center justify-center gap-2"
                         >
-                            <i className="fas fa-edit"></i>
+                            <FaEdit />
                             <span>Edit Staff Details</span>
                         </button>
-                        <button
-                            onClick={handleSendPasswordReset}
-                            className="w-full px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors duration-200 !rounded-button whitespace-nowrap cursor-pointer flex items-center justify-center gap-2"
-                        >
-                            <i className="fas fa-key"></i>
-                            <span>Reset Password</span>
-                        </button>
-                        <button className="w-full px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors duration-200 !rounded-button whitespace-nowrap cursor-pointer flex items-center justify-center gap-2">
-                            <i className="fas fa-trash-alt"></i>
-                            <span>Delete Staff</span>
-                        </button>
+                        <ResetButton staffId={selectedStaffDetails.id} />
+                        <DeleteStaffButton onDelete={() => onDelete(selectedStaffDetails.id)} />
                     </div>
                 </div>
             </div>

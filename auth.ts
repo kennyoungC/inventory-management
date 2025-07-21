@@ -3,12 +3,10 @@ import Credentials from 'next-auth/providers/credentials';
 import { authConfig } from './auth.config';
 
 import bcrypt from 'bcrypt';
-import Restaurant from './app/lib/models/restaurants';
-import dbConnect from './app/lib/db';
-import { setCodeSession } from './app/lib/session';
-// import { setCodeSession } from './app/lib/session';
 
-// Extend the User type to include 'role'
+import { setCodeSession } from './app/lib/session';
+import { getRestaurantByEmail } from './app/lib/actions/restaurant.action';
+
 declare module 'next-auth' {
     interface User {
         id: string;
@@ -19,14 +17,6 @@ declare module 'next-auth' {
     interface Session {
         user: User;
     }
-}
-
-export async function getRestuarantByEmail(email: string) {
-    await dbConnect();
-    const user = await Restaurant.findOne({
-        email,
-    }).select('+password');
-    return user;
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -40,7 +30,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 if (typeof email !== 'string' || typeof password !== 'string') {
                     return null;
                 }
-                const user = await getRestuarantByEmail(email);
+                const user = await getRestaurantByEmail(email);
                 if (!user) return null;
                 const isValid = await bcrypt.compare(password, user.password);
                 if (!isValid) return null;

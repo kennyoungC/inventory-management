@@ -12,7 +12,7 @@ export default auth(async function middleware(req: NextRequest) {
     const session = await auth();
     const pathname = req.nextUrl.pathname;
 
-    if (!session && pathname !== '/sign-in') {
+    if (!session && !['/sign-in', '/register'].includes(pathname)) {
         const newUrl = new URL('/sign-in', req.nextUrl.origin);
         return Response.redirect(newUrl);
     }
@@ -20,8 +20,6 @@ export default auth(async function middleware(req: NextRequest) {
     // For dashboard routes, require a staff/admin code session
     if (pathname.startsWith('/dashboard')) {
         const codeSession = await getCodeSession(req);
-
-        console.log('codeSession exists:', codeSession);
 
         if (!codeSession) {
             return NextResponse.redirect(new URL('/session-starter', req.url));

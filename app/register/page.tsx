@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useActionState, useEffect } from 'react';
-import Inputs from '@/app/ui/Inputs';
+import Inputs from '@/app/ui/components/Inputs/Inputs';
 import { createRestaurant } from '@/app/lib/actions/restaurant.action';
 import { useRouter } from 'next/navigation';
 
@@ -52,49 +52,39 @@ export default function Register() {
                             Complete the form below to get started with FoodStock
                         </p>
                     </div>
-                    <form action={formAction}>
-                        {/* Restaurant Name */}
-                        <div className="mb-6">
-                            <Inputs
-                                label="Restaurant Name"
-                                name="restaurantName"
-                                placeholder="Enter your restaurant name"
-                                error={state?.errors?.restaurantName?.[0]}
-                                defaultValue={state?.values?.restaurantName}
-                            />
-                        </div>
-                        <div className="mb-6">
-                            <Inputs
-                                type="email"
-                                label="Email Address"
-                                name="email"
-                                placeholder="Enter your email address"
-                                error={state?.errors?.email?.[0]}
-                                defaultValue={state?.values?.email}
-                            />
-                        </div>
-                        <div className="mb-6">
-                            <Inputs
-                                type="number"
-                                label="Phone Number"
-                                name="phoneNumber"
-                                placeholder="Enter your phone number"
-                                error={state?.errors?.phoneNumber?.[0]}
-                                defaultValue={state?.values?.phoneNumber}
-                            />
-                        </div>
-                        <div className="mb-6">
-                            <Inputs
-                                label="Address"
-                                name="address"
-                                placeholder="Enter your restaurant address"
-                                error={state?.errors?.address?.[0]}
-                                defaultValue={state?.values?.address}
-                            />
-                        </div>
+                    <form action={formAction} className="space-y-6">
+                        <Inputs
+                            label="Restaurant Name"
+                            name="restaurantName"
+                            placeholder="Enter your restaurant name"
+                            error={state?.errors?.restaurantName?.[0]}
+                            defaultValue={state?.values?.restaurantName}
+                        />
 
-                        {/* Access Code */}
-                        <div className="mb-6">
+                        <Inputs
+                            type="email"
+                            label="Email Address"
+                            name="email"
+                            placeholder="Enter your email address"
+                            error={state?.errors?.email?.[0]}
+                            defaultValue={state?.values?.email}
+                        />
+                        <Inputs
+                            type="number"
+                            label="Phone Number"
+                            name="phoneNumber"
+                            placeholder="Enter your phone number"
+                            error={state?.errors?.phoneNumber?.[0]}
+                            defaultValue={state?.values?.phoneNumber}
+                        />
+                        <Inputs
+                            label="Address"
+                            name="address"
+                            placeholder="Enter your restaurant address"
+                            error={state?.errors?.address?.[0]}
+                            defaultValue={state?.values?.address}
+                        />
+                        <div>
                             <Inputs
                                 type="number"
                                 label="Quick Access Code"
@@ -108,7 +98,6 @@ export default function Register() {
                                 system
                             </p>
                         </div>
-                        {/* Password */}
                         <div className="relative mb-4">
                             <Inputs
                                 type={showPassword ? 'text' : 'password'}

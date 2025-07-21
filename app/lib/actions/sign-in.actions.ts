@@ -2,6 +2,7 @@
 import { signIn, signOut } from '@/auth';
 import { AuthError } from 'next-auth';
 import { object, string } from 'zod';
+import { clearCodeSession } from '../session';
 
 type State = { message: string } | undefined;
 
@@ -44,5 +45,6 @@ export async function logIn(prevState: State, formData: FormData): Promise<State
     }
 }
 export async function logOut() {
+    await clearCodeSession();
     await signOut({ redirectTo: '/sign-in' });
 }
