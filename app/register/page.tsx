@@ -3,8 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useActionState, useEffect } from 'react';
-import Inputs from '@/app/ui/components/Inputs/Inputs';
-import { createRestaurant } from '@/app/lib/actions/restaurant.action';
+import Inputs from '@/components/Inputs';
+import { createRestaurant } from '@/actions/restaurant.action';
 import { useRouter } from 'next/navigation';
 
 export default function Register() {

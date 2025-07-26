@@ -2,9 +2,9 @@
 
 import { useActionState, useEffect } from 'react';
 import { FaTimes } from 'react-icons/fa';
-import Inputs from '@/app/ui/components/Inputs/Inputs';
-import { addNewStaff } from '@/app/lib/actions/staff.actions';
-import Loader from '@/app/ui/components/Loader/Loader';
+import Inputs from '@/components/Inputs';
+import { addNewStaff } from '@/actions/staff.actions';
+import Loader from '@/components/Loader';
 import toast from 'react-hot-toast';
 
 type Props = {
