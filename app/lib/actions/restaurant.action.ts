@@ -4,8 +4,8 @@ import { z } from 'zod';
 import dbConnect from '../db';
 import Restaurant from '../models/restaurants';
 import bcrypt from 'bcrypt';
-import { auth } from '@/auth';
-import { RestaurantModel } from '../types';
+import { auth } from 'auth';
+import type { MongoDuplicateError, RestaurantModel } from '../types';
 
 const fieldNameMap: Record<string, string> = {
     restaurant_name: 'restaurantName',
@@ -41,11 +41,6 @@ export type State = {
         emailUpdates?: boolean;
     };
 } | null;
-
-export interface MongoDuplicateError extends Error {
-    code?: number;
-    keyValue?: Record<string, string>;
-}
 
 const FormSchema = z
     .object({

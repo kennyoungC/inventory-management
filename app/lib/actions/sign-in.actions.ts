@@ -1,5 +1,5 @@
 'use server';
-import { signIn, signOut } from '@/auth';
+import { signIn, signOut } from 'auth';
 import { AuthError } from 'next-auth';
 import { object, string } from 'zod';
 import { clearCodeSession } from '../session';

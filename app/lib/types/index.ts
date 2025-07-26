@@ -35,3 +35,8 @@ export type RestaurantModel = {
     address?: string;
     emailUpdates?: boolean;
 };
+
+export interface MongoDuplicateError extends Error {
+    code?: number;
+    keyValue?: Record<string, string>;
+}

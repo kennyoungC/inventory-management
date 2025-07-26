@@ -2,13 +2,13 @@
 
 import { redirect } from 'next/navigation';
 import dbConnect from '../db';
-import Restaurant from '../models/restaurants';
-import Staff from '../models/staffs';
+import Restaurant from '@/models/restaurants';
+import Staff from '@/models/staffs';
 import { clearCodeSession, setCodeSession } from '../session';
-import { generateUniqueCode } from '@/app/utils/generateCode';
-import { sendAccessCodeEmail } from '@/app/utils/sendAccessCodeEmail';
+import { generateUniqueCode } from '@/utils/generateCode';
+import { sendAccessCodeEmail } from '@/utils/sendAccessCodeEmail';
 import { z } from 'zod';
-import { auth } from '@/auth';
+import { auth } from 'auth';
 
 type State = {
     error?: string;
