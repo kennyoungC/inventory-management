@@ -1,4 +1,4 @@
-import ProductManagement from '@/app/ui/product-management/ProductManagement';
+import ProductManagement from 'app/ui/product-management/ProductManagement';
 import React from 'react';
 import { Metadata } from 'next';
 

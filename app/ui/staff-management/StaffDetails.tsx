@@ -1,8 +1,8 @@
-import { formatDate } from '@/app/utils/formatDate';
+import { formatDate } from '@/utils/formatDate';
 import { FaEdit, FaEnvelope, FaTimes } from 'react-icons/fa';
 import DeleteStaffButton from './DeleteStaffButton';
 import ResetButton from './ResetButton';
-import { StaffModel } from '@/app/lib/types';
+import { StaffModel } from '@/types/index';
 
 type Props = {
     selectedStaffDetails: StaffModel;

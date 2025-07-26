@@ -5,9 +5,9 @@ import StaffCard from './StaffCard';
 import { FaPlus, FaUser } from 'react-icons/fa';
 import StaffDetails from './StaffDetails';
 import CreateNewStaff from './CreateNewStaff';
-import type { StaffModel } from '@/app/lib/types';
+import type { StaffModel } from '@/types/index';
 import toast, { Toaster } from 'react-hot-toast';
-import { deleteStaff } from '@/app/lib/actions/staff.actions';
+import { deleteStaff } from '@/actions/staff.actions';
 import HeaderBar from '../HeaderBar';
 
 type Props = {

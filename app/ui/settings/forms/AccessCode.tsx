@@ -1,5 +1,5 @@
 'use client';
-import { updateAccessCode } from '@/app/lib/actions/session-starter.actions';
+import { updateAccessCode } from '@/actions/session-starter.actions';
 import { useRef, useState, useEffect, useActionState } from 'react';
 import { FaSyncAlt, FaCheckCircle } from 'react-icons/fa';
 

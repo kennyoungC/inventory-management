@@ -1,11 +1,11 @@
 // 'use client';
 
-import { NavItems } from '@/app/lib/types';
+import { NavItems } from '@/types/index';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 import { usePathname } from 'next/navigation';
-import { logOut } from '@/app/lib/actions/sign-in.actions';
+import { logOut } from '@/actions/sign-in.actions';
 
 type Props = {
     isExpanded: boolean;
