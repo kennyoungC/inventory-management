@@ -1,11 +1,11 @@
 'use client';
 
 import { FaCheckCircle, FaKey } from 'react-icons/fa';
-import Inputs from '../../components/Inputs/Inputs';
+import Inputs from '@/components/Inputs';
 import { useActionState, useEffect, useState } from 'react';
 import Image from 'next/image';
-import { changePassword } from '@/app/lib/actions/change-password.actions';
-import Loader from '../../components/Loader/Loader';
+import { changePassword } from '@/actions/change-password.actions';
+import Loader from '@/components/Loader';
 
 const ChangePassword = () => {
     const [showPassword, setShowPassword] = useState(false);

@@ -1,4 +1,4 @@
-import InventoryManagement from '@/app/ui/inventory-management/InventoryManagement';
+import InventoryManagement from 'app/ui/inventory-management/InventoryManagement';
 import React from 'react';
 import { Metadata } from 'next';
 

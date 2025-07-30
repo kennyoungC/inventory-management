@@ -1,5 +1,5 @@
-import { StaffModel } from '@/app/lib/types';
-import { formatDate } from '@/app/utils/formatDate';
+import { StaffModel } from '@/types/index';
+import { formatDate } from '@/utils/formatDate';
 import { FaClock, FaEnvelope } from 'react-icons/fa';
 
 type Prop = {

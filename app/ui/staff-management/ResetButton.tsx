@@ -1,7 +1,7 @@
-import { resetAccessCode } from '@/app/lib/actions/staff.actions';
+import { resetAccessCode } from '@/actions/staff.actions';
 import { useActionState } from 'react';
 import { FaKey } from 'react-icons/fa';
-import Loader from '@/app/ui/components/Loader/Loader';
+import Loader from '@/components/Loader';
 
 const ResetButton = ({ staffId }: { staffId: string }) => {
     const resetAccessCodeWithId = resetAccessCode.bind(null, staffId);

@@ -1,4 +1,4 @@
-import { checkConnection } from '@/app/lib/db';
+import { checkConnection } from 'app/lib/db';
 import { NextResponse } from 'next/server';
 
 export async function GET() {

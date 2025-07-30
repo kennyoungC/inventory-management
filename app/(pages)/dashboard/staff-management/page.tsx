@@ -1,7 +1,7 @@
-import StaffMangement from '@/app/ui/staff-management/StaffMangement';
+import StaffMangement from 'app/ui/staff-management/StaffMangement';
 import React from 'react';
 import { Metadata } from 'next';
-import { getAllStaff } from '@/app/lib/actions/staff.actions';
+import { getAllStaff } from '@/actions/staff.actions';
 
 export const metadata: Metadata = {
     title: 'Staff Management',

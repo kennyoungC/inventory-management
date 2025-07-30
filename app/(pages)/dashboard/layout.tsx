@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import SideBar from '../ui/SideBar';
+import SideBar from '../../ui/SideBar';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     const [isExpanded, setIsExpanded] = useState(false);

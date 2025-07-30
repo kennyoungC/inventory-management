@@ -2,7 +2,7 @@ import HeaderBar from '../HeaderBar';
 import RestaurantProfileForm from './forms/RestaurantProfile';
 import ChangePasswordForm from './forms/ChangePassword';
 import AccessCodeForm from './forms/AccessCode';
-import { getRestaurantById } from '@/app/lib/actions/restaurant.action';
+import { getRestaurantById } from '@/actions/restaurant.action';
 
 export default async function Settings() {
     const restaurant = await getRestaurantById();

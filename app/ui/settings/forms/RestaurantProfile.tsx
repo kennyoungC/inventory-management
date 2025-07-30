@@ -1,10 +1,10 @@
 'use client';
 import React, { useActionState, useEffect, useState } from 'react';
-import Inputs from '@/app/ui/components/Inputs/Inputs';
+import Inputs from '@/components/Inputs';
 import { FaCheckCircle, FaSave } from 'react-icons/fa';
-import { RestaurantModel } from '@/app/lib/types';
-import { updateRestaurantProfile } from '@/app/lib/actions/restaurant.action';
-import Loader from '../../components/Loader/Loader';
+import { RestaurantModel } from '@/types/index';
+import { updateRestaurantProfile } from '@/actions/restaurant.action';
+import Loader from '@/components/Loader';
 
 type Props = {
     restaurant: RestaurantModel;

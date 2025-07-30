@@ -1,14 +1,13 @@
 'use server';
 
-import { generateUniqueCode } from '@/app/utils/generateCode';
-import { sendAccessCodeEmail } from '@/app/utils/sendAccessCodeEmail';
+import { sendAccessCodeEmail } from '@/utils/sendAccessCodeEmail';
 import dbConnect from '../db';
-import Staff from '../models/staffs';
+import Staff from '@/models/staffs';
 import { z } from 'zod';
-import { auth } from '@/auth';
-import { MongoDuplicateError } from './restaurant.action';
+import { auth } from 'auth';
 import { revalidatePath } from 'next/cache';
-import { StaffModel } from '../types';
+import type { MongoDuplicateError, StaffModel } from '../types';
+import { generateUniqueCode } from 'app/utils/generateCode';
 
 export type State = {
     errors?: {

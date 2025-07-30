@@ -1,9 +1,9 @@
 'use server';
 
-import { getCodeSession } from '@/app/lib/session';
-import Staff from '@/app/lib/models/staffs';
-import Restaurant from '@/app/lib/models/restaurants';
-import dbConnect from '@/app/lib/db';
+import { getCodeSession } from 'app/lib/session';
+import Staff from 'app/lib/models/staffs';
+import Restaurant from 'app/lib/models/restaurants';
+import dbConnect from 'app/lib/db';
 import { NextRequest } from 'next/server';
 
 export async function getCurrentSessionUser(req: NextRequest) {

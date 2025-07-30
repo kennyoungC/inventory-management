@@ -1,4 +1,4 @@
-import { InputsProps } from '../../../lib/types';
+import { InputsProps } from '@/types/index';
 
 export default function Inputs({
     label,
