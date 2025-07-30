@@ -1,9 +1,10 @@
 import React from 'react';
+import HeaderBar from '../HeaderBar';
 
 const Dashboard = () => {
     return (
         <div>
-            Dashboard page
+            <HeaderBar title="Dashboard Page" />
             <p>
                 Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab dolore cumque
                 aspernatur fugit cum quas! Molestias consectetur architecto adipisci impedit

@@ -1,7 +1,12 @@
 import React from 'react';
+import HeaderBar from '../HeaderBar';
 
 const ProductManagement = () => {
-    return <div>Product Management Page</div>;
+    return (
+        <div>
+            <HeaderBar title="Product Management System" />
+        </div>
+    );
 };
 
 export default ProductManagement;

@@ -1,6 +1,6 @@
 'use client';
 
-import validateSession, { requestNewStaffCode } from '@/app/lib/actions/session-starter.actions';
+import validateSession, { requestNewStaffCode } from '@/actions/session-starter.actions';
 import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect, FormEvent } from 'react';
 import { useActionState } from 'react';
