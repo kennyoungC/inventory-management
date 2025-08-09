@@ -4,10 +4,10 @@ import { getCodeSession } from 'app/lib/session';
 import Staff from 'app/lib/models/staffs';
 import Restaurant from 'app/lib/models/restaurants';
 import dbConnect from 'app/lib/db';
-import { NextRequest } from 'next/server';
 
-export async function getCurrentSessionUser(req: NextRequest) {
-    const codeSession = await getCodeSession(req);
+export async function getCurrentSessionUser() {
+    const codeSession = await getCodeSession();
+
     if (!codeSession) return null;
 
     await dbConnect();

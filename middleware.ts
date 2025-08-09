@@ -1,25 +1,30 @@
-// import { auth } from '@/auth';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { authConfig } from './auth.config';
 import NextAuth from 'next-auth';
-// import { getToken } from 'next-auth/jwt';
 import { getCodeSession } from './app/lib/session';
 
 const { auth } = NextAuth(authConfig);
 export default auth(async function middleware(req: NextRequest) {
-    // const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-    const session = await auth();
     const pathname = req.nextUrl.pathname;
 
+    // Avoid infinite loop caused by internal requests from Server Components
+
+    // const isInternalFrameworkRequest = req.headers.get('x-middleware-internal') === '1';
+    // if (isInternalFrameworkRequest) {
+    //     return NextResponse.next();
+    // }
+
+    // Protect auth-required pages
+    const session = await auth();
+
     if (!session && !['/sign-in', '/register'].includes(pathname)) {
-        const newUrl = new URL('/sign-in', req.nextUrl.origin);
-        return Response.redirect(newUrl);
+        return NextResponse.redirect(new URL('/sign-in', req.nextUrl.origin));
     }
 
-    // For dashboard routes, require a staff/admin code session
+    // Dashboard-specific rules
     if (pathname.startsWith('/dashboard')) {
-        const codeSession = await getCodeSession(req);
+        const codeSession = await getCodeSession();
 
         if (!codeSession) {
             return NextResponse.redirect(new URL('/session-starter', req.url));

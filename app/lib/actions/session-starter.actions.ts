@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import dbConnect from '../db';
 import Restaurant from '@/models/restaurants';
 import Staff from '@/models/staffs';
-import { clearCodeSession, setCodeSession } from '../session';
+import { clearCodeSession, createCodeSession } from '../session';
 import { generateUniqueCode } from '@/utils/generateCode';
 import { sendAccessCodeEmail } from '@/utils/sendAccessCodeEmail';
 import { z } from 'zod';
@@ -34,7 +34,7 @@ export default async function validateSession(state: unknown | null, formData: F
     if (staff) {
         if (staff.is_active) {
             // Already logged in, allow reuse
-            await setCodeSession('staff', staff._id.toString());
+            await createCodeSession('staff', staff._id.toString());
             return { success: true, type: 'staff', name: staff.full_name };
         }
         if (staff.code_expires_at && staff.code_expires_at < new Date()) {
@@ -45,13 +45,13 @@ export default async function validateSession(state: unknown | null, formData: F
         staff.is_active = true;
         staff.last_login_at = new Date();
         await staff.save();
-        await setCodeSession('staff', staff._id.toString());
+        await createCodeSession('staff', staff._id.toString());
         return { success: true, type: 'staff', name: staff.full_name };
     }
 
     const restaurant = await Restaurant.findOne({ access_code: code });
     if (restaurant) {
-        await setCodeSession('admin', restaurant._id.toString());
+        await createCodeSession('admin', restaurant._id.toString());
         return { success: true, type: 'admin', name: restaurant.restaurant_name };
     }
 
@@ -77,11 +77,6 @@ export async function requestNewStaffCode(state: unknown | null, formData: FormD
     await sendAccessCodeEmail(email, code, expires);
 
     return { success: true, message: 'A new code has been sent to your email.' };
-}
-
-export async function endSession() {
-    await clearCodeSession();
-    redirect('/session-starter');
 }
 
 export async function updateAccessCode(_prevState: State, formData: FormData): Promise<State> {
@@ -119,4 +114,9 @@ export async function updateAccessCode(_prevState: State, formData: FormData): P
         success: true,
         message: 'Quick Access Code updated successfully!',
     };
+}
+
+export async function endSession() {
+    await clearCodeSession();
+    redirect('/session-starter');
 }
