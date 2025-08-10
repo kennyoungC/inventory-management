@@ -8,14 +8,6 @@ const { auth } = NextAuth(authConfig);
 export default auth(async function middleware(req: NextRequest) {
     const pathname = req.nextUrl.pathname;
 
-    // Avoid infinite loop caused by internal requests from Server Components
-
-    // const isInternalFrameworkRequest = req.headers.get('x-middleware-internal') === '1';
-    // if (isInternalFrameworkRequest) {
-    //     return NextResponse.next();
-    // }
-
-    // Protect auth-required pages
     const session = await auth();
 
     if (!session && !['/sign-in', '/register'].includes(pathname)) {

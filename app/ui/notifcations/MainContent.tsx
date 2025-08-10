@@ -33,7 +33,7 @@ const MainContent = () => {
         ? notificationsList.find(notification => notification.id === selectedNotification)
         : null;
     return (
-        <div className="flex-1 overflow-hidden flex">
+        <main className="flex-1 overflow-hidden flex">
             <div
                 className={`flex-1 overflow-y-auto px-8 pb-8 transition-all duration-300 ${showNotificationDetails ? 'mr-[400px]' : ''}`}
             >
@@ -63,7 +63,7 @@ const MainContent = () => {
                     handleDeleteNotification={handleDeleteNotification}
                 />
             )}
-        </div>
+        </main>
     );
 };
 

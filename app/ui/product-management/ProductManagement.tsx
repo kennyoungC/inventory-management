@@ -1,11 +1,12 @@
-import React from 'react';
 import HeaderBar from '../HeaderBar';
+import MainContent from './MainContent';
 
 const ProductManagement = () => {
     return (
-        <div>
+        <>
             <HeaderBar title="Product Management System" />
-        </div>
+            <MainContent />
+        </>
     );
 };
 
