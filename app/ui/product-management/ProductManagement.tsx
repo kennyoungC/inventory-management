@@ -1,11 +1,16 @@
-import React from 'react';
 import HeaderBar from '../HeaderBar';
+import MainContent from './MainContent';
+import { getAllProducts, getAllSuppliers } from 'app/lib/data';
 
-const ProductManagement = () => {
+const ProductManagement = async () => {
+    const suppliers = await getAllSuppliers();
+    const products = await getAllProducts();
+
     return (
-        <div>
+        <>
             <HeaderBar title="Product Management System" />
-        </div>
+            <MainContent suppliers={suppliers} products={products} />
+        </>
     );
 };
 

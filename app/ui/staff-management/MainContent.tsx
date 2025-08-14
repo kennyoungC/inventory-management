@@ -57,8 +57,7 @@ const MainContent = ({ staffList: initialStaffList }: Props) => {
         }
     };
     return (
-        <div>
-            {' '}
+        <>
             <div className="flex-1 overflow-hidden flex flex-col">
                 <div className="flex-1 overflow-hidden flex">
                     <div
@@ -134,7 +133,7 @@ const MainContent = ({ staffList: initialStaffList }: Props) => {
                 </div>
             </div>
             {showAddStaffForm && <CreateNewStaff onCloseStaffDetails={handleCloseDetails} />}
-        </div>
+        </>
     );
 };
 

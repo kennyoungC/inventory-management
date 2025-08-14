@@ -18,7 +18,7 @@ const StaffDetails = ({
     onDelete,
 }: Props) => {
     return (
-        <div className="fixed right-0 top-0 h-screen w-[400px] bg-white shadow-xl overflow-y-auto transform transition-transform duration-300 z-30">
+        <div className="fixed right-0 top-16 h-screen w-[400px] bg-white shadow-xl overflow-y-auto transform transition-transform duration-300 z-30">
             <div className="sticky top-0 bg-white z-10 border-b border-gray-100">
                 <div className="flex items-center justify-between p-6">
                     <h2 className="text-xl font-bold text-gray-800">Staff Details</h2>
@@ -26,7 +26,7 @@ const StaffDetails = ({
                         onClick={onCloseStaffDetails}
                         className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
                     >
-                        <FaTimes size={32} className="cursor-pointer" color="gray" />
+                        <FaTimes size={24} className="cursor-pointer" color="gray" />
                     </button>
                 </div>
             </div>
