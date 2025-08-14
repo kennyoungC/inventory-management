@@ -26,9 +26,9 @@ export type State = {
 } | null;
 
 const fieldNameMap: Record<string, string> = {
-    email: 'email',
-    jobTitle: 'jobTitle',
-    fullName: 'fullName',
+    email: 'Email',
+    jobTitle: 'Job Title',
+    fullName: 'Full Name',
 };
 const FormSchema = z.object({
     email: z.string().email({ message: 'Please enter a valid email.' }).trim(),
@@ -236,6 +236,6 @@ export async function getAllStaff(): Promise<StaffModel[]> {
         }));
     } catch (error) {
         console.error('Error in getAllStaff:', error);
-        return [];
+        throw new Error('Failed to fetch staff list');
     }
 }

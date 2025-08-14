@@ -40,3 +40,29 @@ export interface MongoDuplicateError extends Error {
     code?: number;
     keyValue?: Record<string, string>;
 }
+
+export type ProductModel = {
+    id: string;
+    name: string;
+    sku: string;
+    category: string;
+    currentStock: number;
+    measurementUnit: string;
+    minimumStockLevel: number;
+    storageLocation: string;
+    expirationPeriod: string;
+    supplierId: string;
+    supplierName?: string;
+    createdBy: string;
+    createdAt?: string;
+    updatedAt?: string;
+};
+
+export type supplierModel = {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    contactPerson: string;
+    minimumOrderQuantity: number;
+};
