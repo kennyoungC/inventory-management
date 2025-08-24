@@ -1,3 +1,5 @@
+import { SupplierDto } from '@/models/supplier';
+
 export type NavItems = {
     name: string;
     href: string;
@@ -62,5 +64,31 @@ export type supplierModel = {
     email: string;
     phone: string;
     contactPerson?: string;
-    minimumOrderQuantity: number;
+    minimumOrderQuantity: string | number;
+};
+
+export type ProductWithSupplierDto = {
+    _id: string;
+    name: string;
+    sku: string;
+    category: string;
+    measurement_unit: string;
+    minimum_stock_level: number;
+    current_stock_level: number;
+    storage_location: string;
+    created_by: string;
+    supplier_id: SupplierDto | null;
+};
+
+export type ProductWithSupplierModel = {
+    id: string;
+    name: string;
+    sku: string;
+    category: string;
+    measurementUnit: string;
+    minimumStockLevel: number;
+    currentStock: number;
+    storageLocation: string;
+    createdBy: string;
+    supplier: supplierModel | null;
 };

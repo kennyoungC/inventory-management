@@ -32,3 +32,8 @@ export function prettyCategory(slug: string): string {
     // Otherwise, just title-case and join with spaces.
     return titled.join(' ');
 }
+
+export function capitalizeFirstLetter(input: string): string {
+    if (!input) return '';
+    return input.charAt(0).toUpperCase() + input.slice(1);
+}

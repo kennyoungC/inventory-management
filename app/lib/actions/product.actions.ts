@@ -241,3 +241,34 @@ export async function createProduct(_prevState: State, formData: FormData): Prom
         };
     }
 }
+
+export async function deleteProduct(productId: string) {
+    const session = await auth();
+
+    if (!session?.user?.id) {
+        return {
+            errors: { general: ['You must be logged in to delete products. Please Refresh Page'] },
+            message: 'Authentication required',
+        };
+    }
+
+    await dbConnect();
+
+    try {
+        const result = await Product.deleteOne({ _id: productId, restaurant_id: session.user.id });
+
+        if (!result.acknowledged || result.deletedCount === 0) {
+            return {
+                errors: { general: ['Product not found or you do not have permission to delete.'] },
+                message: 'Product not found',
+            };
+        }
+        return { success: true, message: 'Product deleted successfully' };
+    } catch (error) {
+        console.error('Error deleting product:', error);
+        return {
+            errors: { general: ['Failed to delete product. Please try again later.'] },
+            message: 'Failed to delete product',
+        };
+    }
+}

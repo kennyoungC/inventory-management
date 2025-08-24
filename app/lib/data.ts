@@ -2,7 +2,12 @@ import { auth } from 'auth';
 import dbConnect from './db';
 import Product, { ProductDto } from './models/product';
 import Supplier, { SupplierDto } from './models/supplier';
-import { ProductModel, supplierModel } from './types';
+import {
+    ProductModel,
+    ProductWithSupplierModel,
+    ProductWithSupplierDto,
+    supplierModel,
+} from './types';
 
 export async function getAllSuppliers(): Promise<supplierModel[]> {
     try {
@@ -33,7 +38,7 @@ export async function getAllSuppliers(): Promise<supplierModel[]> {
     }
 }
 
-export async function getSupplierById(id: string): Promise<supplierModel | null> {
+export async function getSupplierById(supplierId: string): Promise<supplierModel | null> {
     try {
         const session = await auth();
         const restaurantId = session?.user?.id;
@@ -45,9 +50,11 @@ export async function getSupplierById(id: string): Promise<supplierModel | null>
         await dbConnect();
 
         const supplier = await Supplier.findOne({
-            _id: id,
+            _id: supplierId,
             restaurant_id: restaurantId,
         }).lean<SupplierDto>();
+
+        console.log({ supplier });
 
         if (!supplier) {
             return null;
@@ -96,5 +103,53 @@ export async function getAllProducts(): Promise<ProductModel[]> {
     } catch (error) {
         console.error('Error fetching products:', error);
         throw new Error('Failed to fetch products');
+    }
+}
+
+export async function getProductWithSupplier(
+    productId: string,
+): Promise<ProductWithSupplierModel | null> {
+    try {
+        const session = await auth();
+        const restaurantId = session?.user?.id;
+
+        if (!restaurantId) {
+            throw new Error('Unauthorized: No restaurant session found.');
+        }
+
+        await dbConnect();
+
+        const productWithSupplier = await Product.findById(productId)
+            .populate('supplier_id')
+            .lean<ProductWithSupplierDto>();
+
+        if (!productWithSupplier) {
+            return null;
+        }
+
+        return {
+            id: productWithSupplier._id?.toString(),
+            name: productWithSupplier.name,
+            sku: productWithSupplier.sku,
+            category: productWithSupplier.category,
+            currentStock: productWithSupplier.current_stock_level,
+            measurementUnit: productWithSupplier.measurement_unit,
+            minimumStockLevel: productWithSupplier.minimum_stock_level,
+            storageLocation: productWithSupplier.storage_location,
+            createdBy: productWithSupplier.created_by,
+            supplier: productWithSupplier.supplier_id
+                ? {
+                      id: productWithSupplier.supplier_id._id.toString(),
+                      name: productWithSupplier.supplier_id.supplier_name,
+                      email: productWithSupplier.supplier_id.supplier_email,
+                      phone: productWithSupplier.supplier_id.supplier_phone_number,
+                      contactPerson: productWithSupplier.supplier_id.supplier_contact_person,
+                      minimumOrderQuantity: `${productWithSupplier.supplier_id.supplier_minimum_order_quantity} ${productWithSupplier.measurement_unit}`,
+                  }
+                : null,
+        };
+    } catch (error) {
+        console.error('Error fetching product by ID:', error);
+        throw new Error('Failed to fetch product');
     }
 }

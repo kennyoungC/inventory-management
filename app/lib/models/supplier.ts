@@ -59,13 +59,6 @@ const SupplierSchema = new Schema<SupplierDto>(
     },
 );
 
-// SupplierSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
-//     const Product = (await import('./product')).default;
-//     const count = await Product.countDocuments({ supplier: this._id });
-//     if (count > 0) return next(new Error('Cannot delete supplier while products reference it'));
-//     next();
-// });
-
 SupplierSchema.index({ restaurant_id: 1, supplier_email: 1 }, { unique: true });
 SupplierSchema.index({ restaurant_id: 1, supplier_name: 1 }, { unique: true });
 
