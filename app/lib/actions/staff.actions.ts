@@ -2,33 +2,25 @@
 
 import { sendAccessCodeEmail } from '@/utils/sendAccessCodeEmail';
 import dbConnect from '../db';
-import Staff from '@/models/staffs';
+import Staff, { StaffDto } from '@/models/staffs';
 import { z } from 'zod';
 import { auth } from 'auth';
 import { revalidatePath } from 'next/cache';
 import type { MongoDuplicateError, StaffModel } from '../types';
 import { generateUniqueCode } from 'app/utils/generateCode';
+import { MapMongoDuplicateError } from '@/utils/mongoDuplicateError';
+
+type valueName = 'email' | 'jobTitle' | 'fullName' | 'general';
 
 export type State = {
-    errors?: {
-        email?: Array<string>;
-        jobTitle?: Array<string>;
-        fullName?: Array<string>;
-        general?: Array<string>;
-    };
+    errors?: Partial<Record<valueName, string[]>>;
     success?: boolean;
     message?: string;
-    values?: {
-        email: string;
-        jobTitle: string;
-        fullName: string;
-    };
+    values?: Partial<Record<valueName, string>>;
 } | null;
 
 const fieldNameMap: Record<string, string> = {
-    email: 'Email',
-    jobTitle: 'Job Title',
-    fullName: 'Full Name',
+    email: 'email',
 };
 const FormSchema = z.object({
     email: z.string().email({ message: 'Please enter a valid email.' }).trim(),
@@ -37,11 +29,7 @@ const FormSchema = z.object({
 });
 
 export async function addNewStaff(prevState: State, formData: FormData): Promise<State> {
-    const data = {
-        email: formData.get('email')?.toString() ?? '',
-        jobTitle: formData.get('jobTitle')?.toString() ?? '',
-        fullName: formData.get('fullName')?.toString() ?? '',
-    };
+    const data = Object.fromEntries(formData.entries());
 
     const validateFields = FormSchema.safeParse(data);
 
@@ -67,6 +55,7 @@ export async function addNewStaff(prevState: State, formData: FormData): Promise
     await dbConnect();
 
     const code = await generateUniqueCode();
+
     const expires = new Date(Date.now() + 60 * 60 * 1000);
 
     try {
@@ -84,29 +73,18 @@ export async function addNewStaff(prevState: State, formData: FormData): Promise
 
         revalidatePath('/dashboard/staff-management');
         return { success: true, message: 'Staff added successfully' };
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-        if (error instanceof Error) {
-            const mongoError = error as MongoDuplicateError;
-            if ('code' in mongoError && mongoError.code === 11000 && mongoError.keyValue) {
-                const duplicateFieldRaw = Object.keys(mongoError.keyValue)[0];
-                const duplicateField = fieldNameMap[duplicateFieldRaw] || duplicateFieldRaw;
-                const duplicateValue = mongoError.keyValue[duplicateFieldRaw];
+    } catch (error) {
+        const mongoError = error as MongoDuplicateError;
 
-                return {
-                    errors: {
-                        [duplicateField]: [
-                            `${duplicateField.toUpperCase()} "${duplicateValue}" already exists.`,
-                        ],
-                    },
-                    message: 'Duplicate value error',
-                    values: data,
-                };
-            }
+        const duplicateResult = MapMongoDuplicateError(mongoError, fieldNameMap);
+        if (duplicateResult) {
+            return { ...duplicateResult, values: data };
         }
+
+        const message = error instanceof Error ? error.message : 'An unexpected error occurred';
         return {
-            errors: { general: ['Failed to add staff. Please try again later.'] },
-            message: 'Failed to add staff',
+            errors: { general: [message] },
+            message: 'Failed to create product',
             values: data,
         };
     }
@@ -199,31 +177,11 @@ export async function getAllStaff(): Promise<StaffModel[]> {
             throw new Error('Unauthorized: No restaurant session found.');
         }
 
-        const staffList = await Staff.find({ restaurant_id: restaurantId })
-            .select({
-                _id: 1,
-                restaurant_id: 1,
-                full_name: 1,
-                job_title: 1,
-                is_active: 1,
-                email: 1,
-                last_login_at: 1,
-            })
-            .lean<
-                {
-                    _id: string;
-                    restaurant_id: string;
-                    full_name: string;
-                    job_title: string;
-                    is_active: boolean;
-                    email: string;
-                    last_login_at: Date | string | null;
-                }[]
-            >();
+        const staffList = await Staff.find({ restaurant_id: restaurantId }).lean<StaffDto[]>();
 
         return staffList.map(staff => ({
-            id: staff._id?.toString() ?? '',
-            restaurantId: staff.restaurant_id?.toString() ?? '',
+            id: staff._id.toString(),
+            restaurantId: staff.restaurant_id.toString(),
             fullName: staff.full_name,
             jobTitle: staff.job_title,
             isActive: staff.is_active,

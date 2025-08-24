@@ -1,12 +1,12 @@
 import React from 'react';
 import HeaderBar from '../HeaderBar';
-import { MainContent } from './MainContent';
+import MainContent from './MainContent';
 
-const ProductDetails = () => {
+const ProductDetails = ({ productId }: { productId: string }) => {
     return (
         <>
             <HeaderBar title="Product Management System" />
-            <MainContent />
+            <MainContent productId={productId} />
         </>
     );
 };

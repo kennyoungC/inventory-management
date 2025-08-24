@@ -1,6 +1,7 @@
 import { Schema, model, models, Document } from 'mongoose';
 
 export interface ProductDto extends Document {
+    _id: Schema.Types.ObjectId;
     name: string;
     sku: string;
     category: string;
@@ -9,11 +10,18 @@ export interface ProductDto extends Document {
     current_stock_level: number;
     storage_location: string;
     supplier_id: Schema.Types.ObjectId;
+    restaurant_id: Schema.Types.ObjectId;
     created_by: string;
 }
 
 const ProductSchema = new Schema<ProductDto>(
     {
+        restaurant_id: {
+            type: Schema.Types.ObjectId,
+            ref: 'Restaurant',
+            required: true,
+            trim: true,
+        },
         name: {
             type: String,
             required: [true, 'Please provide a name for this product.'],

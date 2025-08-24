@@ -11,7 +11,6 @@ type PageProps = {
 
 export default async function Page(props: PageProps) {
     const { id } = await props.params;
-    console.log({ id });
 
-    return <ProductDetails />;
+    return <ProductDetails productId={id} />;
 }

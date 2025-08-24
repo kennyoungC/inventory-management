@@ -1,7 +1,8 @@
 import { Schema, model, models, Document } from 'mongoose';
 import validator from 'validator';
 
-export interface Restaurant extends Document {
+export interface RestaurantDto extends Document {
+    _id: Schema.Types.ObjectId;
     restaurant_name: string;
     email: string;
     address: string;
@@ -12,7 +13,7 @@ export interface Restaurant extends Document {
     email_updates?: boolean;
 }
 
-const RestaurantSchema = new Schema<Restaurant>(
+const RestaurantSchema = new Schema<RestaurantDto>(
     {
         restaurant_name: {
             type: String,
@@ -40,7 +41,6 @@ const RestaurantSchema = new Schema<Restaurant>(
         access_code: {
             type: Number,
             required: [true, 'Access code is required'],
-            unique: true,
             validate: {
                 validator: function (v: number) {
                     return /^\d{6}$/.test(v.toString());
@@ -82,5 +82,5 @@ const RestaurantSchema = new Schema<Restaurant>(
     },
 );
 
-const Restaurant = models.Restaurant || model<Restaurant>('Restaurant', RestaurantSchema);
+const Restaurant = models.Restaurant || model<RestaurantDto>('Restaurant', RestaurantSchema);
 export default Restaurant;
