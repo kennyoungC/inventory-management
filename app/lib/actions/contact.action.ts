@@ -35,8 +35,6 @@ export async function handleContactForm(
         };
     }
 
-    console.log('Contact form data:', data);
-
     try {
         await sendContactUsEmail(data);
         return { success: true, message: 'Thanks for reaching out! We’ll get back to you soon.' };

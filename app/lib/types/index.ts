@@ -50,9 +50,7 @@ export type ProductModel = {
     measurementUnit: string;
     minimumStockLevel: number;
     storageLocation: string;
-    expirationPeriod: string;
     supplierId: string;
-    supplierName?: string;
     createdBy: string;
     createdAt?: string;
     updatedAt?: string;
@@ -63,6 +61,6 @@ export type supplierModel = {
     name: string;
     email: string;
     phone: string;
-    contactPerson: string;
+    contactPerson?: string;
     minimumOrderQuantity: number;
 };

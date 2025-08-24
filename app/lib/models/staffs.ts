@@ -2,6 +2,7 @@ import { Schema, model, models, Document } from 'mongoose';
 import validator from 'validator';
 
 export interface StaffDto extends Document {
+    _id: Schema.Types.ObjectId;
     restaurant_id: Schema.Types.ObjectId;
     full_name: string;
     email: string;
@@ -33,7 +34,6 @@ const StaffSchema = new Schema<StaffDto>(
         email: {
             type: String,
             required: [true, 'Please provide an email'],
-            unique: true,
             lowercase: true,
             validate: [validator.isEmail, 'Please provide a valid email'],
         },
@@ -41,7 +41,6 @@ const StaffSchema = new Schema<StaffDto>(
         access_code: {
             type: Number,
             required: [true, 'Access code is required'],
-            unique: true,
             sparse: true,
             validate: {
                 validator: function (v: number) {
@@ -56,6 +55,9 @@ const StaffSchema = new Schema<StaffDto>(
         timestamps: true,
     },
 );
+
+StaffSchema.index({ restaurant_id: 1, access_code: 1 }, { unique: true });
+StaffSchema.index({ restaurant_id: 1, email: 1 }, { unique: true });
 
 const Staff = models.Staff || model<StaffDto>('Staff', StaffSchema);
 export default Staff;

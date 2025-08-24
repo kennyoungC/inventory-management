@@ -33,7 +33,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 if (!user) return null;
                 const isValid = await bcrypt.compare(password, user.password);
                 if (!isValid) return null;
-                console.log(user);
 
                 await createCodeSession(user.role, user._id.toString());
 

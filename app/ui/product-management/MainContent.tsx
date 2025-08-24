@@ -12,6 +12,7 @@ import {
 import CreateNewProduct from './CreateNewProduct';
 import Link from 'next/link';
 import { ProductModel, supplierModel } from '@/types/index';
+import { prettyCategory } from '@/utils/getInitials';
 
 const categories = [
     { label: 'All Items', icon: null, id: 'all' },
@@ -23,18 +24,18 @@ const categories = [
 ];
 
 type CategoryKey =
-    | 'Wine & Spirits'
-    | 'Meat & Poultry'
-    | 'Fresh Produce'
-    | 'Dairy & Eggs'
-    | 'Pantry Items';
+    | 'wine-spirits'
+    | 'meat-poultry'
+    | 'fresh-produce'
+    | 'dairy-eggs'
+    | 'pantry-items';
 
 const categoryIcons: Record<CategoryKey, JSX.Element> = {
-    'Wine & Spirits': <FaWineGlass size={12} className="inline mr-1 mb-1" />,
-    'Meat & Poultry': <FaDrumstickBite size={12} className="inline mr-1 mb-1" />,
-    'Fresh Produce': <FaApple size={12} className="inline mr-1 mb-1" />,
-    'Dairy & Eggs': <FaEgg size={12} className="inline mr-1 mb-1" />,
-    'Pantry Items': <FaWineGlassAlt size={12} className="inline mr-1 mb-1" />,
+    'wine-spirits': <FaWineGlass size={12} className="inline mr-1 mb-1" />,
+    'meat-poultry': <FaDrumstickBite size={12} className="inline mr-1 mb-1" />,
+    'fresh-produce': <FaApple size={12} className="inline mr-1 mb-1" />,
+    'dairy-eggs': <FaEgg size={12} className="inline mr-1 mb-1" />,
+    'pantry-items': <FaWineGlassAlt size={12} className="inline mr-1 mb-1" />,
 };
 
 const getCategoryIcon = (cat: string) => categoryIcons[cat as CategoryKey] || null;
@@ -110,7 +111,7 @@ export default function MainContent({ suppliers, products }: Props) {
                                 <span>{prod.sku}</span>
                                 <span className="mx-1">&bull;</span>
                                 {getCategoryIcon(prod.category)}
-                                <span>{prod.category}</span>
+                                <span>{prettyCategory(prod.category)}</span>
                             </div>
                             <div className="flex items-baseline gap-2 mb-1">
                                 <span className="text-sm text-gray-500">Current Stock</span>
@@ -124,7 +125,7 @@ export default function MainContent({ suppliers, products }: Props) {
                             </div>
                             <div className="self-end flex items-center justify-end">
                                 <Link
-                                    href={`/dashboard/product-details/${prod.sku}`}
+                                    href={`/dashboard/product-details/${prod.id}`}
                                     className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                                 >
                                     View Details &gt;

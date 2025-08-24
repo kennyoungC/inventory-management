@@ -4,6 +4,7 @@ import { getAllProducts, getAllSuppliers } from 'app/lib/data';
 
 const ProductManagement = async () => {
     const suppliers = await getAllSuppliers();
+
     const products = await getAllProducts();
 
     return (

@@ -9,6 +9,7 @@ import { revalidatePath } from 'next/cache';
 import type { MongoDuplicateError } from '../types';
 import { generateSKU } from './generateSKU';
 import { getCurrentSessionUser } from './current-session-user.actions';
+import { MapMongoDuplicateError } from '@/utils/mongoDuplicateError';
 
 type valueName =
     | 'name'
@@ -26,7 +27,7 @@ type valueName =
     | 'supplierContactPerson'
     | 'supplierPhoneNumber'
     | 'supplierEmail'
-    | 'supplierMinimumOrder';
+    | 'supplierMinimumOrderQuantity';
 
 export type State = {
     errors?: Partial<Record<valueName, Array<string>>>;
@@ -36,16 +37,8 @@ export type State = {
 } | null;
 
 const fieldNameMap: Record<string, string> = {
-    name: 'name',
-    category: 'category',
-    currentStock: 'currentStock',
-    measurementUnit: 'measurementUnit',
-    minimumStockLevel: 'minimumStockLevel',
-    storageLocation: 'storageLocation',
-    additionalNotes: 'additionalNotes',
-    supplierType: 'supplierType',
-    supplierSelection: 'supplierSelection',
-    email: 'supplierEmail',
+    supplier_email: 'supplierEmail',
+    supplier_name: 'supplierName',
 };
 const startingCurrentStock = 0;
 
@@ -79,8 +72,11 @@ const ProductSchema = z
                     message: 'Phone number must contain 10-15 digits when provided',
                 },
             ),
-        supplierEmail: z.string().optional(),
-        supplierMinimumOrder: z.string().optional(),
+        supplierEmail: z
+            .string()
+            .optional()
+            .transform(val => val?.toLowerCase()),
+        supplierMinimumOrderQuantity: z.string().optional(),
     })
     .superRefine((data, ctx) => {
         if (data.supplierType === 'external' && data.supplierSelection === 'new') {
@@ -112,9 +108,9 @@ const ProductSchema = z
                     code: z.ZodIssueCode.custom,
                 });
             }
-            if (!data.supplierMinimumOrder) {
+            if (!data.supplierMinimumOrderQuantity) {
                 ctx.addIssue({
-                    path: ['supplierMinimumOrder'],
+                    path: ['supplierMinimumOrderQuantity'],
                     message: 'Minimum order is required',
                     code: z.ZodIssueCode.custom,
                 });
@@ -132,8 +128,6 @@ const ProductSchema = z
 
 export async function createProduct(_prevState: State, formData: FormData): Promise<State> {
     const data = Object.fromEntries(formData.entries());
-
-    console.log(data);
 
     const validateFields = ProductSchema.safeParse(data);
     if (!validateFields.success) {
@@ -156,7 +150,7 @@ export async function createProduct(_prevState: State, formData: FormData): Prom
         supplierContactPerson,
         supplierType,
         supplierSelection,
-        supplierMinimumOrder,
+        supplierMinimumOrderQuantity,
         existingSupplierId,
     } = validateFields.data;
 
@@ -175,15 +169,43 @@ export async function createProduct(_prevState: State, formData: FormData): Prom
         await dbConnect();
 
         let supplierIdToUse: string | undefined = existingSupplierId;
-        const sku = await generateSKU(name, category);
+        const sku = await generateSKU(name, category, session?.user?.id);
 
         if (supplierType === 'external' && supplierSelection === 'new') {
+            const errors: Record<string, string[]> = {};
+            const [existingEmail, existingName] = await Promise.all([
+                Supplier.findOne({
+                    restaurant_id: session?.user?.id,
+                    supplier_email: supplierEmail,
+                }).lean(),
+                Supplier.findOne({
+                    restaurant_id: session?.user?.id,
+                    supplier_name: supplierName,
+                }).lean(),
+            ]);
+            if (existingEmail) {
+                errors.supplierEmail = [`Email "${supplierEmail}" already exists`];
+            }
+
+            if (existingName) {
+                errors.supplierName = [`Name "${supplierName}" already exists`];
+            }
+
+            if (Object.keys(errors).length > 0) {
+                return {
+                    errors,
+                    message: 'Duplicate values found',
+                    values: data,
+                };
+            }
+
             const created = await Supplier.create({
-                name: supplierName,
-                contact_person: supplierContactPerson,
-                phone: supplierPhoneNumber,
-                email: supplierEmail,
-                minimum_order_quantity: Number(supplierMinimumOrder),
+                supplier_name: supplierName,
+                supplier_contact_person: supplierContactPerson,
+                supplier_phone_number: supplierPhoneNumber,
+                supplier_email: supplierEmail,
+                supplier_minimum_order_quantity: Number(supplierMinimumOrderQuantity),
+                restaurant_id: session?.user?.id,
             });
             supplierIdToUse = created._id.toString();
         }
@@ -198,42 +220,24 @@ export async function createProduct(_prevState: State, formData: FormData): Prom
             storage_location: storageLocation,
             supplier_id: supplierIdToUse,
             created_by: user.name,
+            restaurant_id: session?.user?.id,
         });
 
         revalidatePath('/dashboard/product-management');
         return { success: true, message: 'Product created successfully' };
     } catch (error) {
-        if (error instanceof Error) {
-            console.error('Validation failed:', error.message);
+        const mongoError = error as MongoDuplicateError;
 
-            const mongoError = error as MongoDuplicateError;
-            if ('code' in mongoError && mongoError.code === 11000 && mongoError.keyValue) {
-                const duplicateFieldRaw = Object.keys(mongoError.keyValue)[0];
-                const duplicateField = fieldNameMap[duplicateFieldRaw] || duplicateFieldRaw;
-                const duplicateValue = mongoError.keyValue[duplicateFieldRaw];
-
-                return {
-                    errors: {
-                        [duplicateField]: [
-                            `${duplicateField.toUpperCase()} "${duplicateValue}" already exists.`,
-                        ],
-                    },
-                    message: 'Duplicate value error',
-                    values: data,
-                };
-            }
-
-            return {
-                errors: { general: [error.message] },
-                message: 'Failed to create restaurant',
-            };
-        } else {
-            console.error('Validation failed:', error);
-            return {
-                errors: { general: ['An unexpected error occurred'] },
-                message: 'Failed to create restaurant',
-                values: data,
-            };
+        const duplicateResult = MapMongoDuplicateError(mongoError, fieldNameMap);
+        if (duplicateResult) {
+            return { ...duplicateResult, values: data };
         }
+
+        const message = error instanceof Error ? error.message : 'An unexpected error occurred';
+        return {
+            errors: { general: [message] },
+            message: 'Failed to create product',
+            values: data,
+        };
     }
 }

@@ -100,9 +100,6 @@ export async function updateAccessCode(_prevState: State, formData: FormData): P
     // (Optional) Forbid reusing the old code
     const restaurant = await Restaurant.findById(restaurantId);
 
-    console.log('Updating access code for restaurant:', restaurant);
-    console.log('Updating access code for code:', code);
-
     if (restaurant.access_code === Number(code)) {
         return { error: 'Old Access Code Detected.', message: 'Previous Access Code Detected.' };
     }

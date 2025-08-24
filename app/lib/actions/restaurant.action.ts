@@ -2,10 +2,21 @@
 
 import { z } from 'zod';
 import dbConnect from '../db';
-import Restaurant from '../models/restaurants';
+import Restaurant, { RestaurantDto } from '../models/restaurants';
 import bcrypt from 'bcrypt';
 import { auth } from 'auth';
 import type { MongoDuplicateError, RestaurantModel } from '../types';
+
+type valueName =
+    | 'restaurantName'
+    | 'email'
+    | 'phoneNumber'
+    | 'accessCode'
+    | 'address'
+    | 'emailUpdates'
+    | 'general'
+    | 'password'
+    | 'confirmPassword';
 
 const fieldNameMap: Record<string, string> = {
     restaurant_name: 'restaurantName',
@@ -17,35 +28,20 @@ const fieldNameMap: Record<string, string> = {
 };
 
 export type State = {
-    errors?: {
-        restaurantName?: Array<string>;
-        email?: Array<string>;
-        phoneNumber?: Array<string>;
-        accessCode?: Array<string>;
-        password?: Array<string>;
-        address?: Array<string>;
-        confirmPassword?: Array<string>;
-        emailUpdates?: Array<string>;
-        general?: Array<string>;
-    };
+    errors?: Partial<Record<valueName, string[]>>;
     success?: boolean;
     message?: string;
-    values?: {
-        restaurantName: string;
-        email: string;
-        phoneNumber: string;
-        accessCode?: string;
-        password?: string;
-        confirmPassword?: string;
-        address?: string;
-        emailUpdates?: boolean;
-    };
+    values?: Partial<Record<valueName, string>>;
 } | null;
 
 const FormSchema = z
     .object({
         restaurantName: z.string().min(1, 'Restaurant name is required'),
-        email: z.string().email({ message: 'Please enter a valid email.' }).trim(),
+        email: z
+            .string()
+            .email({ message: 'Please enter a valid email.' })
+            .trim()
+            .transform(value => value.toLowerCase()),
         phoneNumber: z.string().regex(/^\d{10,15}$/, 'Phone number must be 10-15 digits'),
         accessCode: z.string().regex(/^\d{6}$/, 'Access code must be exactly 6 digits'),
         password: z
@@ -70,18 +66,10 @@ const UpdateProfileSchema = z.object({
     email: z.string().email({ message: 'Please enter a valid email.' }).trim(),
     phoneNumber: z.string().regex(/^\d{10,15}$/, 'Phone number must be 10-15 digits'),
     address: z.string().min(1, 'Address is required').trim(),
-    emailUpdates: z.preprocess(val => val === 'true' || val === true, z.boolean()), // for form input
+    emailUpdates: z.preprocess(val => val === 'on' || val === true, z.boolean()),
 });
 export async function createRestaurant(prevState: State, formData: FormData): Promise<State> {
-    const data = {
-        restaurantName: formData.get('restaurantName')?.toString() ?? '',
-        email: formData.get('email')?.toString() ?? '',
-        phoneNumber: formData.get('phoneNumber')?.toString() ?? '',
-        accessCode: formData.get('accessCode')?.toString() ?? '',
-        password: formData.get('password')?.toString() ?? '',
-        confirmPassword: formData.get('confirmPassword')?.toString() ?? '',
-        address: formData.get('address')?.toString() ?? '',
-    };
+    const data = Object.fromEntries(formData.entries());
 
     const validateFields = FormSchema.safeParse(data);
 
@@ -179,32 +167,17 @@ export async function getRestaurantById(): Promise<RestaurantModel | null> {
         const restaurantId = session?.user?.id;
         if (!restaurantId) return null;
 
-        const restaurant = await Restaurant.findById(restaurantId)
-            .select({
-                _id: 1,
-                restaurant_name: 1,
-                email: 1,
-                phone_number: 1,
-                access_code: 1,
-                address: 1,
-            })
-            .lean<{
-                _id: string;
-                restaurant_name: string;
-                email: string;
-                phone_number: string;
-                access_code: string;
-                address?: string;
-            }>();
+        const restaurant = await Restaurant.findById(restaurantId).lean<RestaurantDto>();
 
         if (!restaurant) return null;
         return {
             id: restaurant._id.toString(),
             restaurantName: restaurant.restaurant_name,
             email: restaurant.email,
-            phoneNumber: restaurant.phone_number,
-            accessCode: restaurant.access_code,
+            phoneNumber: String(restaurant.phone_number),
+            accessCode: String(restaurant.access_code),
             address: restaurant.address,
+            emailUpdates: restaurant.email_updates,
         };
     } catch (error) {
         console.error('Error in getRestaurantById:', error);
@@ -224,14 +197,18 @@ export async function updateRestaurantProfile(
     prevState: State,
     formData: FormData,
 ): Promise<State> {
-    const data = {
-        restaurantName: formData.get('restaurantName')?.toString() ?? '',
-        email: formData.get('email')?.toString() ?? '',
-        phoneNumber: formData.get('phoneNumber')?.toString() ?? '',
-        address: formData.get('address')?.toString() ?? '',
-        emailUpdates:
-            formData.get('emailUpdates') === 'on' || formData.get('emailUpdates') === 'true',
-    };
+    // const data = {
+    //     restaurantName: formData.get('restaurantName')?.toString() ?? '',
+    //     email: formData.get('email')?.toString() ?? '',
+    //     phoneNumber: formData.get('phoneNumber')?.toString() ?? '',
+    //     address: formData.get('address')?.toString() ?? '',
+    //     emailUpdates:
+    //         formData.get('emailUpdates') === 'on' || formData.get('emailUpdates') === 'true',
+    // };
+
+    const data = Object.fromEntries(formData.entries());
+
+    console.log({ data });
 
     const validateFields = UpdateProfileSchema.safeParse(data);
 
@@ -252,7 +229,9 @@ export async function updateRestaurantProfile(
 
         const { restaurantName, email, phoneNumber, address, emailUpdates } = validateFields.data;
 
-        const existing = await Restaurant.findOne({ email }).lean<{ _id?: unknown }>();
+        console.log({ emailUpdates });
+
+        const existing = await Restaurant.findOne({ email }).lean<RestaurantDto>();
 
         if (
             existing &&
@@ -271,7 +250,7 @@ export async function updateRestaurantProfile(
             email,
             phone_number: phoneNumber,
             address,
-            email_updates: !!emailUpdates,
+            email_updates: emailUpdates,
         });
 
         return {

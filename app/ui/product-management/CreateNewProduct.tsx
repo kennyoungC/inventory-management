@@ -23,8 +23,6 @@ type Props = {
 };
 
 const CreateNewProduct = ({ onClose, supplierOptions }: Props) => {
-    console.log(supplierOptions);
-
     const [state, formAction, isPending] = useActionState(createProduct, null);
     const [supplierType, setSupplierType] = useState(INTERNAL);
     const [supplierSelectionType, setSupplierSelectionType] = useState<'existing' | 'new'>(
@@ -285,10 +283,14 @@ const CreateNewProduct = ({ onClose, supplierOptions }: Props) => {
                                             />
                                             <Inputs
                                                 label="Minimum Order"
-                                                name="supplierMinimumOrder"
+                                                name="supplierMinimumOrderQuantity"
                                                 placeholder="Enter minimum order"
-                                                defaultValue={state?.values?.supplierMinimumOrder}
-                                                error={state?.errors?.supplierMinimumOrder?.[0]}
+                                                defaultValue={
+                                                    state?.values?.supplierMinimumOrderQuantity
+                                                }
+                                                error={
+                                                    state?.errors?.supplierMinimumOrderQuantity?.[0]
+                                                }
                                                 type="number"
                                                 onKeyDown={handleKeyDown}
                                             />
