@@ -4,8 +4,9 @@ import { Metadata } from 'next';
 export const metadata: Metadata = {
     title: 'Inventory Management',
 };
-const Page = () => {
+
+async function Page() {
     return <InventoryManagement />;
-};
+}
 
 export default Page;

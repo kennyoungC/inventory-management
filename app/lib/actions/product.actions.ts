@@ -1,7 +1,7 @@
 'use server';
 
 import dbConnect from '../db';
-import Product from '@/models/product';
+import Product, { ProductDto } from '@/models/product';
 import Supplier from '@/models/supplier';
 import { z } from 'zod';
 import { auth } from 'auth';
@@ -54,7 +54,7 @@ const ProductSchema = z
             .min(1, 'Minimum stock level must above 0'),
         storageLocation: z.string().min(1, 'Storage location is required').trim(),
         additionalNotes: z.string().optional(),
-        supplierType: z.enum(['internal', 'external']),
+        supplierType: z.enum(['internal', 'external']).optional(),
         supplierSelection: z.enum(['existing', 'new']).optional(),
         existingSupplierId: z.string().optional(),
         supplierName: z.string().optional(),
@@ -148,6 +148,7 @@ export async function createProduct(_prevState: State, formData: FormData): Prom
         supplierPhoneNumber,
         supplierEmail,
         supplierContactPerson,
+        additionalNotes,
         supplierType,
         supplierSelection,
         supplierMinimumOrderQuantity,
@@ -221,6 +222,7 @@ export async function createProduct(_prevState: State, formData: FormData): Prom
             supplier_id: supplierIdToUse,
             created_by: user.name,
             restaurant_id: session?.user?.id,
+            additional_notes: additionalNotes,
         });
 
         revalidatePath('/dashboard/product-management');
@@ -269,6 +271,75 @@ export async function deleteProduct(productId: string) {
         return {
             errors: { general: ['Failed to delete product. Please try again later.'] },
             message: 'Failed to delete product',
+        };
+    }
+}
+
+export async function editProduct(
+    productId: string,
+    _prevState: State,
+    formData: FormData,
+): Promise<State> {
+    const data = Object.fromEntries(formData.entries());
+
+    const validateFields = ProductSchema.safeParse(data);
+
+    if (!validateFields.success) {
+        return {
+            errors: validateFields.error.flatten().fieldErrors,
+            message: 'Validation failed',
+            values: data,
+        };
+    }
+
+    const session = await auth();
+
+    if (!session?.user?.id) {
+        return {
+            errors: { general: ['You must be logged in to edit products. Please Refresh Page'] },
+            message: 'Authentication required',
+        };
+    }
+
+    try {
+        await dbConnect();
+
+        const {
+            name,
+            category,
+            measurementUnit,
+            minimumStockLevel,
+            storageLocation,
+            additionalNotes,
+            existingSupplierId,
+        } = validateFields.data;
+
+        const currentProduct = await Product.findById(productId).lean<ProductDto>();
+
+        let sku = currentProduct?.sku;
+        if (name !== currentProduct?.name || category !== currentProduct?.category) {
+            sku = await generateSKU(name, category, session?.user?.id);
+        }
+
+        await Product.findByIdAndUpdate(productId, {
+            name,
+            sku,
+            category,
+            measurement_unit: measurementUnit,
+            minimum_stock_level: minimumStockLevel,
+            current_stock_level: currentProduct?.current_stock_level,
+            storage_location: storageLocation,
+            additional_notes: additionalNotes,
+            supplier_id: existingSupplierId,
+        });
+
+        revalidatePath('/dashboard/product-management/' + productId);
+        return { success: true, message: 'Product updated successfully' };
+    } catch (error) {
+        console.error('Error updating product:', error);
+        return {
+            errors: { general: ['Failed to update product. Please try again later.'] },
+            message: 'Failed to update product',
         };
     }
 }

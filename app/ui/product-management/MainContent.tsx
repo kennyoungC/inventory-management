@@ -108,7 +108,7 @@ export default function MainContent({ suppliers, products }: Props) {
                                 </p>
                             </div>
                             <div className="text-xs text-gray-400 mb-3 mt-0.5 flex items-start">
-                                <span>{prod.sku}</span>
+                                <span>SKU: {prod.sku}</span>
                                 <span className="mx-1">&bull;</span>
                                 {getCategoryIcon(prod.category)}
                                 <span>{prettyCategory(prod.category)}</span>

@@ -8,12 +8,13 @@ export default function Inputs({
     type,
     defaultValue,
     required,
+    formGroupClass,
     ...rest
 }: InputsProps) {
     const inputId = `${name}-input`;
 
     return (
-        <div>
+        <div className={`${formGroupClass} `}>
             <label htmlFor={inputId} className="block text-sm font-medium text-gray-700">
                 {label}
                 {required && <span className="ml-1 text-red-500">*</span>}

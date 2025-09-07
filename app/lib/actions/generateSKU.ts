@@ -1,4 +1,3 @@
-// lib/generateSKU.ts
 import { getInitials } from '@/utils/getInitials';
 import dbConnect from '../db';
 import SkuCounter from '@/models/sku-counter';

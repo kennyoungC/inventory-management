@@ -1,5 +1,3 @@
-'use server';
-
 import { getCodeSession } from 'app/lib/session';
 import Staff from 'app/lib/models/staffs';
 import Restaurant from 'app/lib/models/restaurants';
@@ -16,7 +14,7 @@ export async function getCurrentSessionUser() {
         const staff = await Staff.findById(codeSession.id);
         if (!staff) return null;
         return {
-            type: 'staff',
+            role: 'staff',
             name: staff.full_name,
             jobTitle: staff.job_title,
             email: staff.email,
@@ -26,7 +24,7 @@ export async function getCurrentSessionUser() {
         const admin = await Restaurant.findById(codeSession.id);
         if (!admin) return null;
         return {
-            type: 'admin',
+            role: 'admin',
             name: admin.restaurant_name,
             email: admin.email,
             jobTitle: 'Admin',

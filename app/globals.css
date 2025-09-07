@@ -29,3 +29,11 @@ html {
         background-position-x: -100%;
     }
 }
+
+@layer utilities {
+    .scrollbar::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+        background: transparent;
+    }
+}

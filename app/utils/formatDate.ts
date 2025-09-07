@@ -1,12 +1,11 @@
-export const formatDate = (dateString: string | undefined) => {
-    if (!dateString) return '';
+export const formatDate = (dateString: string | Date, addTime: boolean = false) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
+        hour: addTime ? '2-digit' : undefined,
+        minute: addTime ? '2-digit' : undefined,
     });
 };
 
@@ -29,4 +28,10 @@ export const formatDateToRelative = (dateString: string) => {
             year: now.getFullYear() !== date.getFullYear() ? 'numeric' : undefined,
         });
     }
+};
+
+export const getOneWeekFromToday = (): string => {
+    const today = new Date();
+    today.setDate(today.getDate() + 7);
+    return today.toISOString().split('T')[0];
 };

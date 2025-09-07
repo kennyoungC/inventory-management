@@ -28,7 +28,7 @@ const StaffCard = ({ staff }: Prop) => {
                 <div className="flex items-center text-gray-600">
                     <FaClock color="gray" />
                     <span className="ml-2 text-sm">
-                        Last login: {formatDate(staff.lastLoginAt)}
+                        Last login: {formatDate(staff.lastLoginAt, true)}
                     </span>
                 </div>
             </div>

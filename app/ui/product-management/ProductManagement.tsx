@@ -1,10 +1,10 @@
+import { getAllProducts } from '@/data/product';
 import HeaderBar from '../HeaderBar';
 import MainContent from './MainContent';
-import { getAllProducts, getAllSuppliers } from 'app/lib/data';
+import { getAllSuppliers } from '@/data/supplier';
 
 const ProductManagement = async () => {
-    const suppliers = await getAllSuppliers();
-    const products = await getAllProducts();
+    const [products, suppliers] = await Promise.all([getAllProducts(), getAllSuppliers()]);
 
     return (
         <>

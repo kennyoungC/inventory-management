@@ -3,18 +3,20 @@
 import { sendContactUsEmail } from '@/utils/sendContactUsEmail';
 import { z } from 'zod';
 
+type ValueName = 'name' | 'email' | 'message' | 'general';
+
+export type ContactFormServerState = {
+    errors?: Partial<Record<ValueName, string[]>>;
+    values?: Partial<Record<ValueName, string>>;
+    success?: boolean;
+    message?: string;
+} | null;
+
 const ContactSchema = z.object({
     name: z.string().min(2, 'Name is required'),
     email: z.string().email('Provide a valid email'),
     message: z.string().min(10, 'Message is too short').max(500),
 });
-
-export type ContactFormServerState = {
-    errors?: { name?: string[]; email?: string[]; message?: string[]; general?: string[] };
-    values?: { name?: string; email?: string; message?: string };
-    success?: boolean;
-    message?: string;
-} | null;
 
 export async function handleContactForm(
     _prev: ContactFormServerState,
