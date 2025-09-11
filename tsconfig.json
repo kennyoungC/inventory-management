@@ -26,7 +26,8 @@
             "@/utils/*": ["app/utils/*"],
             "@/models/*": ["app/lib/models/*"],
             "@/data/*": ["app/lib/data/*"],
-            "@/transformers/*": ["app/lib/transformers/*"]
+            "@/transformers/*": ["app/lib/transformers/*"],
+            "@/ui/*": ["app/ui/*"]
         }
     },
     "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

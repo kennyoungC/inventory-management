@@ -1,4 +1,4 @@
-import HeaderBar from '../HeaderBar';
+import HeaderBar from '@/ui/HeaderBar';
 import MainContent from './MainContent';
 
 const InventoryManagement = () => {

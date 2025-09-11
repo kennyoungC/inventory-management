@@ -1,5 +1,4 @@
-import React from 'react';
-import HeaderBar from '../HeaderBar';
+import HeaderBar from '@/ui/HeaderBar';
 
 const Dashboard = () => {
     return (

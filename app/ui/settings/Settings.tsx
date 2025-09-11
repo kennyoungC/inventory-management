@@ -1,4 +1,4 @@
-import HeaderBar from '../HeaderBar';
+import HeaderBar from '@/ui/HeaderBar';
 import RestaurantProfileForm from './forms/RestaurantProfile';
 import ChangePasswordForm from './forms/ChangePassword';
 import AccessCodeForm from './forms/AccessCode';
