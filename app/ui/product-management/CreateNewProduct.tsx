@@ -3,6 +3,7 @@
 import { createProduct } from '@/actions/product.actions';
 import Inputs from '@/components/Inputs';
 import SelectInput from '@/components/SelectInput/SelectInput';
+import TextAreaInput from '@/components/TextArea';
 import { measurementUnitsGrouped, SelectOption } from '@/utils/measureUnits';
 import { useActionState, useEffect, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
@@ -135,29 +136,14 @@ const CreateNewProduct = ({ onClose, supplierOptions }: Props) => {
                                 defaultValue={state?.values?.storageLocation}
                                 error={state?.errors?.storageLocation?.[0]}
                             />
-                            {/* <Inputs
-                                label="Expiration Period"
-                                name="expirationPeriod"
-                                placeholder="Enter expiration period"
-                                defaultValue={state?.values?.expirationPeriod}
-                                error={state?.errors?.expirationPeriod?.[0]}
-                            /> */}
                         </div>
-                        <div className="mt-5">
-                            <label
-                                htmlFor="notes"
-                                className="block text-sm font-medium text-gray-700 mb-1"
-                            >
-                                Additional Notes
-                            </label>
-                            <textarea
-                                id="notes"
-                                name="additionalNotes"
-                                placeholder="Enter any additional notes about the product..."
-                                className="mt-1 block w-full min-h-[56px] rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none sm:text-sm"
-                                defaultValue={state?.values?.additionalNotes}
-                            />
-                        </div>
+                        <TextAreaInput
+                            id="notes"
+                            name="additionalNotes"
+                            label="Additional Notes"
+                            placeholder="Enter any additional notes about the product..."
+                            defaultValue={state?.values?.additionalNotes ?? ''}
+                        />
                         {/* SUPPLIER */}
                         <div className="border-t border-gray-200 mt-8 pt-6">
                             <h3 className="text-base font-semibold mb-3 text-gray-900">

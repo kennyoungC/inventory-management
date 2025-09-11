@@ -3,6 +3,7 @@
 import { deleteProduct } from '@/actions/product.actions';
 import { useRouter } from 'next/navigation';
 import { FaTrash } from 'react-icons/fa';
+import toast from 'react-hot-toast';
 
 const DeleteButton = ({ productId }: { productId: string }) => {
     const router = useRouter();
@@ -13,8 +14,9 @@ const DeleteButton = ({ productId }: { productId: string }) => {
             if (result?.success) {
                 router.push('/dashboard/product-management');
             } else {
-                //TODO Handle error (show toast.)
-                //! alert(result?.errors?.general?.[0] || 'Failed to delete product');
+                toast.error(result?.message || 'Failed to delete product');
+
+                return;
             }
         } catch (error) {
             console.error('Delete failed:', error);

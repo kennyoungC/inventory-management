@@ -1,7 +1,12 @@
 import InfoRow from '@/components/InfoRow';
+import { ProductWithSupplierModel } from '@/types/index';
 import React from 'react';
 
-const StockInformation = ({ product }) => {
+type Props = {
+    product: ProductWithSupplierModel;
+};
+
+const StockInformation = ({ product }: Props) => {
     return (
         <div className="bg-white p-6 rounded-lg shadow-sm">
             <h2 className="text-lg font-bold text-gray-900 border-b border-gray-100 pb-4">
@@ -10,18 +15,20 @@ const StockInformation = ({ product }) => {
             <div className="mt-4">
                 <InfoRow
                     label="Current Stock"
-                    value={product.stockInfo.currentStock}
+                    value={product.currentStock}
                     valueClassName="text-lg !font-bold !text-gray-900"
                 />
                 <InfoRow label="Category" value={product.category} />
                 <InfoRow
                     label="Status"
                     valueClassName="bg-green-100 text-green-700 px-2.5 py-0.5 rounded-full text-xs font-bold"
-                    value={product.stockInfo.status}
+                    value={'In Stock'}
                 />
-                <InfoRow label="Minimum Stock Level" value={product.stockInfo.minStockLevel} />
-                <InfoRow label="Storage Location" value={product.stockInfo.storageLocation} />
-                <InfoRow label="Expiration Period" value={product.stockInfo.expirationPeriod} />
+                <InfoRow
+                    label="Minimum Stock Level"
+                    value={`${product.minimumStockLevel} ${product.measurementUnit}s`}
+                />
+                <InfoRow label="Storage Location" value={product.storageLocation} />
             </div>
         </div>
     );

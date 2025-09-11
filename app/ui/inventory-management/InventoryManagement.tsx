@@ -1,7 +1,13 @@
-import React from 'react';
+import HeaderBar from '../HeaderBar';
+import MainContent from './MainContent';
 
 const InventoryManagement = () => {
-    return <div>Inventory Management Page</div>;
+    return (
+        <>
+            <HeaderBar title="Inventory Management System" />
+            <MainContent />
+        </>
+    );
 };
 
 export default InventoryManagement;

@@ -51,7 +51,10 @@ const MainContent = () => {
                             />
                         ))
                     ) : (
-                        <EmptyState />
+                        <EmptyState
+                            title="No notifications"
+                            description="You're all caught up! New notifications about staff, inventory, and orders will appear here."
+                        />
                     )}
                 </div>
             </div>

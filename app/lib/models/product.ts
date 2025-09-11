@@ -9,8 +9,10 @@ export interface ProductDto extends Document {
     minimum_stock_level: number;
     current_stock_level: number;
     storage_location: string;
+    additional_notes: string;
     supplier_id: Schema.Types.ObjectId;
     restaurant_id: Schema.Types.ObjectId;
+    stock_history: Schema.Types.ObjectId;
     created_by: string;
 }
 
@@ -20,7 +22,7 @@ const ProductSchema = new Schema<ProductDto>(
             type: Schema.Types.ObjectId,
             ref: 'Restaurant',
             required: true,
-            trim: true,
+            index: true,
         },
         name: {
             type: String,
@@ -52,11 +54,20 @@ const ProductSchema = new Schema<ProductDto>(
             type: String,
             required: [true, 'Please provide a storage location for this product.'],
         },
+        additional_notes: {
+            type: String,
+            required: false,
+        },
         supplier_id: {
             type: Schema.Types.ObjectId,
             ref: 'Supplier',
             required: false,
             index: true,
+        },
+        stock_history: {
+            type: Schema.Types.ObjectId,
+            ref: 'StockHistory',
+            required: false,
         },
         created_by: {
             type: String,

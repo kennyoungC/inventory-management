@@ -197,18 +197,7 @@ export async function updateRestaurantProfile(
     prevState: State,
     formData: FormData,
 ): Promise<State> {
-    // const data = {
-    //     restaurantName: formData.get('restaurantName')?.toString() ?? '',
-    //     email: formData.get('email')?.toString() ?? '',
-    //     phoneNumber: formData.get('phoneNumber')?.toString() ?? '',
-    //     address: formData.get('address')?.toString() ?? '',
-    //     emailUpdates:
-    //         formData.get('emailUpdates') === 'on' || formData.get('emailUpdates') === 'true',
-    // };
-
     const data = Object.fromEntries(formData.entries());
-
-    console.log({ data });
 
     const validateFields = UpdateProfileSchema.safeParse(data);
 
@@ -258,6 +247,7 @@ export async function updateRestaurantProfile(
             message: 'Profile updated successfully.',
             values: {
                 ...data,
+                //TODO! WHAT IS THIS??
                 phoneNumber,
             },
         };

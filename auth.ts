@@ -11,6 +11,7 @@ declare module 'next-auth' {
     interface User {
         id: string;
         email: string;
+        role: 'staff' | 'admin';
     }
 
     interface Session {
@@ -39,6 +40,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 return {
                     id: user._id.toString(),
                     email: user.email,
+                    role: user.role,
                 };
             },
         }),
@@ -46,20 +48,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     secret: process.env.NEXTAUTH_SECRET,
     session: {
         strategy: 'jwt',
-        maxAge: 7 * 24 * 60 * 60,
-    },
-    callbacks: {
-        async jwt({ token, user }) {
-            if (user) {
-                token.id = user.id;
-                token.email = user.email;
-            }
-            return token;
-        },
-        async session({ session, token }) {
-            session.user.id = token.id as string;
-            session.user.email = token.email as string;
-            return session;
-        },
+        maxAge: 2 * 24 * 60 * 60,
     },
 });

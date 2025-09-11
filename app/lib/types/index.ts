@@ -9,11 +9,12 @@ export type NavItems = {
 export interface InputsProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label: string;
     name: string;
-    placeholder: string;
+    placeholder?: string;
     error?: string;
     type?: string;
     defaultValue?: string;
     required?: boolean;
+    formGroupClass?: string;
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -24,7 +25,7 @@ export type StaffModel = {
     jobTitle: string;
     isActive: boolean;
     email: string;
-    lastLoginAt?: string;
+    lastLoginAt: string;
     role?: string;
 };
 
@@ -52,7 +53,7 @@ export type ProductModel = {
     measurementUnit: string;
     minimumStockLevel: number;
     storageLocation: string;
-    supplierId: string;
+    supplierId?: string;
     createdBy: string;
     createdAt?: string;
     updatedAt?: string;
@@ -76,7 +77,10 @@ export type ProductWithSupplierDto = {
     minimum_stock_level: number;
     current_stock_level: number;
     storage_location: string;
+    additional_notes: string;
     created_by: string;
+    updatedAt?: Date;
+    createdAt?: Date;
     supplier_id: SupplierDto | null;
 };
 
@@ -90,5 +94,41 @@ export type ProductWithSupplierModel = {
     currentStock: number;
     storageLocation: string;
     createdBy: string;
+    additionalNotes: string;
+    updatedAt?: Date;
     supplier: supplierModel | null;
 };
+
+export type SectionType = 'addition' | 'removal';
+
+export interface StockHistoryModel {
+    restaurantId: string;
+    createdBy: string;
+    createdByModel: 'Staff' | 'Restaurant';
+    productId: string;
+    entryType: 'addition' | 'removal';
+    entryId: string;
+    entryDate: Date;
+    quantity: number;
+    measurementUnit: string;
+    expirationDate?: Date;
+    additionalNotes?: string;
+    previousStock: number;
+    newStock: number;
+    reason?: string;
+    batchId: string;
+}
+
+export type StockEntry = {
+    batchId: string;
+    entryId: string;
+    quantity: string;
+    createdBy: string;
+    entryDate: string;
+    additionalNotes?: string;
+    entryType: 'addition' | 'removal';
+    expirationLabel: LabelStatus | undefined;
+    expirationDate?: string | undefined;
+};
+
+export type LabelStatus = 'Expired' | 'Expiring soon' | 'Valid';

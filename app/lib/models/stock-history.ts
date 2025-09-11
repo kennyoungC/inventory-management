@@ -1,67 +1,98 @@
-import { Schema, model, models, Document, Types } from 'mongoose';
+import { Schema, model, models, Document } from 'mongoose';
+import { SectionType } from '../types';
 
 export interface StockHistoryDto extends Document {
-    product_id: Schema.Types.ObjectId;
     restaurant_id: Schema.Types.ObjectId;
-    staff_id: Schema.Types.ObjectId;
-    action: 'add' | 'remove';
+    stock_created_by: Schema.Types.ObjectId;
+    created_by_model: 'Staff' | 'Restaurant';
+    product_id: Schema.Types.ObjectId;
+    entry_type: SectionType;
+    entry_id: string;
+    entry_date: Date;
     quantity: number;
-    previous_stock?: number;
-    new_stock?: number;
-    batch_id?: string;
-    transaction_id: string;
-    comments?: string;
+    measurement_unit: string;
+    expiration_date: Date;
+    additional_notes: string;
+    previous_stock: number;
+    new_stock: number;
+    reason: string;
+    batch_id: string;
 }
 
 const StockHistorySchema = new Schema<StockHistoryDto>(
     {
-        product_id: {
-            type: Schema.Types.ObjectId,
-            ref: 'Product',
-            required: true,
-            index: true,
-        },
         restaurant_id: {
             type: Schema.Types.ObjectId,
             ref: 'Restaurant',
             required: true,
             index: true,
         },
-        staff_id: {
+        product_id: {
             type: Schema.Types.ObjectId,
-            ref: 'Staff',
+            ref: 'Product',
             required: true,
             index: true,
         },
-        action: {
+        stock_created_by: {
+            type: Schema.Types.ObjectId,
+            required: true,
+            refPath: 'created_by_model', // ✅ Use refPath instead of ref array
+            index: true,
+        },
+        created_by_model: {
             type: String,
-            enum: ['add', 'remove'],
+            required: true,
+            enum: ['Staff', 'Restaurant'], // ✅ Define which models can be referenced
+        },
+        entry_type: {
+            type: String,
+            enum: ['addition', 'removal'],
             required: true,
         },
+        entry_date: {
+            type: Date,
+            required: true,
+            default: Date.now,
+        },
+        measurement_unit: {
+            type: String,
+            required: [true, 'Please provide a measurement unit for this product.'],
+        },
+
         quantity: {
             type: Number,
             required: true,
-            // Positive for add, positive number for remove as absolute value
             min: [1, 'Quantity must be at least 1'],
+        },
+        expiration_date: {
+            type: Date,
+            allowNull: true,
+            required: false,
         },
         previous_stock: {
             type: Number,
+            required: true,
         },
         new_stock: {
             type: Number,
+            required: true,
         },
         batch_id: {
             type: String,
+            required: true,
         },
-        transaction_id: {
+        reason: {
+            type: String,
+            maxlength: [200, 'Reason cannot exceed 200 characters'],
+        },
+        entry_id: {
             type: String,
             required: true,
             unique: true,
-            default: () => new Types.ObjectId().toHexString(),
         },
-        comments: {
+        additional_notes: {
             type: String,
-            maxlength: [500, 'Comments cannot exceed 500 characters'],
+            maxlength: [500, 'Additional notes cannot exceed 500 characters'],
         },
     },
     {

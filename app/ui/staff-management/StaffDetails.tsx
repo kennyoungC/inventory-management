@@ -77,7 +77,7 @@ const StaffDetails = ({
                             <div className="flex items-center justify-between">
                                 <span className="text-gray-600">Last Login</span>
                                 <span className="text-gray-800 text-sm">
-                                    {formatDate(selectedStaffDetails.lastLoginAt)}
+                                    {formatDate(selectedStaffDetails.lastLoginAt, true)}
                                 </span>
                             </div>
                         </div>

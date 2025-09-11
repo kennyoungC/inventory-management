@@ -13,3 +13,10 @@ export async function generateUniqueCode(): Promise<number> {
 
     throw new Error('Unable to generate a unique code after several attempts.');
 }
+
+export const generateEntryId = () => {
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
+    const suffix = Math.floor(Math.random() * 900) + 100;
+    return `SE-${dateStr}-${suffix}`;
+};
