@@ -86,11 +86,37 @@ export const getStockHistoryCardData = async (productId: string) => {
             .lean<StockHistoryDto[]>();
 
         return {
-            additions: additions.map(toCardModel),
-            removals: removals.map(toCardModel),
+            additions: additions.map(item => toCardModel(item, false)),
+            removals: removals.map(item => toCardModel(item, false)),
         };
     } catch (error) {
         console.error('Error fetching stock history card data:', error);
         throw new Error('Failed to fetch stock history card data');
     }
 };
+
+export const getAllStockHistory = cache(async (productId: string) => {
+    try {
+        await dbConnect();
+
+        const session = await auth();
+        const restaurantId = session?.user.id;
+
+        if (!restaurantId) {
+            throw new Error('Unauthorized: No restaurant session found.');
+        }
+
+        const history = await StockHistory.find({
+            product_id: productId,
+            restaurant_id: restaurantId,
+        })
+            .populate('stock_created_by')
+            .sort({ entry_date: -1 })
+            .lean<StockHistoryDto[]>();
+
+        return history.map(item => toCardModel(item, true));
+    } catch (error) {
+        console.error('Error fetching all stock history:', error);
+        throw new Error('Failed to fetch all stock history');
+    }
+});

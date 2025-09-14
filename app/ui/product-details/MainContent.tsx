@@ -5,10 +5,14 @@ import StockInformation from './StockInformation';
 import SupplierInformation from './SupplierInformation';
 import { getAllSuppliers } from '@/data/supplier';
 import { getProductWithSupplier } from '@/data/product';
+import { getAllStockHistory } from '@/data/stock-history';
 
 const MainContent = async ({ productId }: { productId: string }) => {
-    const productWithSupplier = await getProductWithSupplier(productId);
-    const suppliers = await getAllSuppliers();
+    const [productWithSupplier, suppliers, stockHistory] = await Promise.all([
+        getProductWithSupplier(productId),
+        getAllSuppliers(),
+        getAllStockHistory(productId),
+    ]);
 
     if (!productWithSupplier) {
         return <div>Product not found</div>;
@@ -27,7 +31,7 @@ const MainContent = async ({ productId }: { productId: string }) => {
                     )}
                 </div>
 
-                <StockHistory />
+                <StockHistory stockHistory={stockHistory} />
             </div>
         </main>
     );

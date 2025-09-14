@@ -107,7 +107,9 @@ export async function createStockEntry(
 
         if (entryType === 'removal' && newStock < 0) {
             return {
-                errors: { quantity: ['Insufficient stock available'] },
+                errors: {
+                    quantity: ['Insufficient stock available, Please add stock before removing'],
+                },
                 message: 'Cannot remove more stock than available',
             };
         }

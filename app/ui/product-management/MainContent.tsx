@@ -8,6 +8,8 @@ import {
     FaPlus,
     FaWineGlass,
     FaWineGlassAlt,
+    FaBoxOpen,
+    FaSearch,
 } from 'react-icons/fa';
 import CreateNewProduct from './CreateNewProduct';
 import Link from 'next/link';
@@ -62,6 +64,10 @@ export default function MainContent({ suppliers, products }: Props) {
         setShowAddProductForm(false);
     };
 
+    // Get the selected category label for empty state
+    const selectedCategoryLabel =
+        categories.find(cat => cat.id === selectedCategory)?.label || 'All Items';
+
     return (
         <>
             <div className="min-h-screen bg-gray-50 py-8 px-8">
@@ -92,49 +98,126 @@ export default function MainContent({ suppliers, products }: Props) {
                         className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors duration-200 !rounded-button whitespace-nowrap cursor-pointer ml-4"
                     >
                         <FaPlus />
-                        <span> Add New Product</span>
+                        <span>Add New Product</span>
                     </button>
                 </div>
 
-                <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {filteredProducts.map(prod => (
-                        <div
-                            key={prod.sku}
-                            className="group bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-lg transition-shadow duration-200 p-5 cursor-pointer"
-                        >
-                            <div>
-                                <p className="text-blue-700 font-semibold text-lg hover:underline">
-                                    {prod.name}
-                                </p>
+                {/* Products Grid or Empty State */}
+                {filteredProducts.length > 0 ? (
+                    <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        {filteredProducts.map(prod => (
+                            <div
+                                key={prod.sku}
+                                className="group bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-lg transition-shadow duration-200 p-5 cursor-pointer"
+                            >
+                                <div>
+                                    <p className="text-blue-700 font-semibold text-lg hover:underline">
+                                        {prod.name}
+                                    </p>
+                                </div>
+                                <div className="text-xs text-gray-400 mb-3 mt-0.5 flex items-start">
+                                    <span>SKU: {prod.sku}</span>
+                                    <span className="mx-1">&bull;</span>
+                                    {getCategoryIcon(prod.category)}
+                                    <span>{prettyCategory(prod.category)}</span>
+                                </div>
+                                <div className="flex items-baseline gap-2 mb-1">
+                                    <span className="text-sm text-gray-500">Current Stock</span>
+                                    <span className="font-semibold text-gray-900 ml-auto text-[16px]">
+                                        {`${prod.currentStock ?? 0} ${prod.measurementUnit}`}
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-between text-xs text-gray-500 mb-5">
+                                    <span>Created by</span>
+                                    <span className="ml-[2px]">{prod.createdBy}</span>
+                                </div>
+                                <div className="self-end flex items-center justify-end">
+                                    <Link
+                                        href={`/dashboard/product-details/${prod.id}`}
+                                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                                    >
+                                        View Details &gt;
+                                    </Link>
+                                </div>
                             </div>
-                            <div className="text-xs text-gray-400 mb-3 mt-0.5 flex items-start">
-                                <span>SKU: {prod.sku}</span>
-                                <span className="mx-1">&bull;</span>
-                                {getCategoryIcon(prod.category)}
-                                <span>{prettyCategory(prod.category)}</span>
-                            </div>
-                            <div className="flex items-baseline gap-2 mb-1">
-                                <span className="text-sm text-gray-500">Current Stock</span>
-                                <span className="font-semibold text-gray-900 ml-auto text-[16px]">
-                                    {`${prod.currentStock ?? 0} ${prod.measurementUnit}`}
-                                </span>
-                            </div>
-                            <div className="flex items-center justify-between text-xs text-gray-500 mb-5">
-                                <span>Created by</span>
-                                <span className="ml-[2px]">{prod.createdBy}</span>
-                            </div>
-                            <div className="self-end flex items-center justify-end">
-                                <Link
-                                    href={`/dashboard/product-details/${prod.id}`}
-                                    className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                                >
-                                    View Details &gt;
-                                </Link>
-                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    /* Empty State */
+                    <div className="flex flex-col items-center justify-center py-5 px-4">
+                        <div className="w-20 h-20 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+                            {selectedCategory === 'all' ? (
+                                <FaBoxOpen className="w-8 h-8 text-gray-400" />
+                            ) : (
+                                <FaSearch className="w-8 h-8 text-gray-400" />
+                            )}
                         </div>
-                    ))}
-                </div>
+
+                        <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                            {selectedCategory === 'all'
+                                ? 'No products found'
+                                : `No products in ${selectedCategoryLabel}`}
+                        </h3>
+
+                        <p className="text-gray-500 text-center mb-8 max-w-md">
+                            {selectedCategory === 'all'
+                                ? "You haven't added any products to your inventory yet. Get started by adding your first product."
+                                : `There are no products in the ${selectedCategoryLabel.toLowerCase()} category. Try selecting a different category or add a new product.`}
+                        </p>
+
+                        <div className="flex flex-col sm:flex-row gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setShowAddProductForm(true)}
+                                className="flex items-center gap-2 px-6 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200"
+                            >
+                                <FaPlus />
+                                Add Your First Product
+                            </button>
+
+                            {selectedCategory !== 'all' && (
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedCategory('all')}
+                                    className="flex items-center gap-2 px-6 py-3 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors duration-200"
+                                >
+                                    View All Products
+                                </button>
+                            )}
+                        </div>
+
+                        {/* Optional: Show category suggestions when no products in category */}
+                        {selectedCategory !== 'all' && products.length > 0 && (
+                            <div className="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                                <p className="text-sm text-blue-700 mb-2">
+                                    <strong>Suggestion:</strong> You have products in other
+                                    categories.
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                    {categories
+                                        .filter(
+                                            cat => cat.id !== selectedCategory && cat.id !== 'all',
+                                        )
+                                        .filter(cat =>
+                                            products.some(prod => prod.category === cat.id),
+                                        )
+                                        .slice(0, 3)
+                                        .map(cat => (
+                                            <button
+                                                key={cat.id}
+                                                onClick={() => setSelectedCategory(cat.id)}
+                                                className="px-3 py-1 text-xs bg-white border border-blue-300 text-blue-700 rounded-full hover:bg-blue-100 transition-colors"
+                                            >
+                                                {cat.icon} {cat.label}
+                                            </button>
+                                        ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
+
             {showAddProductForm && (
                 <CreateNewProduct
                     supplierOptions={supplierOptions}

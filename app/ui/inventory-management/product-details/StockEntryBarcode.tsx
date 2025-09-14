@@ -1,4 +1,7 @@
+'use client';
 import Barcode from 'react-barcode';
+import { useReactToPrint } from 'react-to-print';
+import { useRef } from 'react';
 
 interface StockEntryBarcodeProps {
     entryId: string;
@@ -7,24 +10,31 @@ interface StockEntryBarcodeProps {
 }
 
 const StockEntryBarcode = ({ entryId, className, batchId }: StockEntryBarcodeProps) => {
+    const contentRef = useRef<HTMLDivElement>(null);
+    const reactToPrintFn = useReactToPrint({
+        documentTitle: `StockEntry-${entryId}`,
+        contentRef,
+    });
+
     return (
-        <div
-            className={`flex flex-col items-center p-4 bg-white rounded-lg shadow-sm ${className}`}
-        >
-            <Barcode
-                value={entryId}
-                format="CODE128"
-                width={1}
-                height={40}
-                displayValue={true}
-                fontSize={14}
-                textAlign="center"
-                textMargin={8}
-                background="#ffffff"
-                lineColor="#000000"
-            />
-            <p className="text-sm text-gray-600 mt-2">Batch ID: {batchId}</p>
-            <p className="text-sm text-gray-600 mt-2">Created By: {batchId}</p>
+        <div className={className}>
+            <button className="cursor-pointer" onClick={reactToPrintFn}>
+                <div ref={contentRef}>
+                    <Barcode
+                        value={entryId}
+                        format="CODE128B"
+                        width={0.7}
+                        height={40}
+                        displayValue={true}
+                        fontSize={14}
+                        textAlign="center"
+                        textMargin={8}
+                        background="#ffffff"
+                        lineColor="#000000"
+                    />
+                    <span className="hidden print:block ml-4">#{batchId}</span>
+                </div>
+            </button>
         </div>
     );
 };
