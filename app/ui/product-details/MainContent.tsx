@@ -6,13 +6,17 @@ import SupplierInformation from './SupplierInformation';
 import { getAllSuppliers } from '@/data/supplier';
 import { getProductWithSupplier } from '@/data/product';
 import { getAllStockHistory } from '@/data/stock-history';
+import { getCurrentSessionUser } from '@/actions/current-session-user.actions';
 
 const MainContent = async ({ productId }: { productId: string }) => {
-    const [productWithSupplier, suppliers, stockHistory] = await Promise.all([
+    const [productWithSupplier, suppliers, stockHistory, currentUser] = await Promise.all([
         getProductWithSupplier(productId),
         getAllSuppliers(),
         getAllStockHistory(productId),
+        getCurrentSessionUser(),
     ]);
+
+    const isAdmin = currentUser?.role === 'admin';
 
     if (!productWithSupplier) {
         return <div>Product not found</div>;
@@ -20,7 +24,11 @@ const MainContent = async ({ productId }: { productId: string }) => {
 
     return (
         <main className="bg-gray-50 p-4 sm:p-6 lg:p-8">
-            <ProductHeaderDetails suppliers={suppliers} product={productWithSupplier} />
+            <ProductHeaderDetails
+                suppliers={suppliers}
+                product={productWithSupplier}
+                isAdmin={isAdmin}
+            />
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
                 <div className="lg:col-span-3 flex flex-col gap-6">
                     <StockInformation product={productWithSupplier} />
@@ -30,7 +38,6 @@ const MainContent = async ({ productId }: { productId: string }) => {
                         <NoSupplierInfo />
                     )}
                 </div>
-
                 <StockHistory stockHistory={stockHistory} />
             </div>
         </main>
