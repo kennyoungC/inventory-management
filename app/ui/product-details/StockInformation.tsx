@@ -21,8 +21,10 @@ const StockInformation = ({ product }: Props) => {
                 <InfoRow label="Category" value={product.category} />
                 <InfoRow
                     label="Status"
-                    valueClassName="bg-green-100 text-green-700 px-2.5 py-0.5 rounded-full text-xs font-bold"
-                    value={'In Stock'}
+                    valueClassName={`${product.currentStock > product.minimumStockLevel ? 'text-green-700 bg-green-100' : 'text-yellow-700 bg-yellow-100'} px-2.5 py-0.5 rounded-full text-xs font-bold`}
+                    value={
+                        product.currentStock > product.minimumStockLevel ? 'In Stock' : 'Low Stock'
+                    }
                 />
                 <InfoRow
                     label="Minimum Stock Level"

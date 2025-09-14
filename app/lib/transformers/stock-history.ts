@@ -26,7 +26,7 @@ export function transformStockHistory(dto: StockHistoryDto[]): StockHistoryModel
 type StaffCreatedBy = { staff_name?: string };
 type RestaurantCreatedBy = { restaurant_name?: string };
 
-export function toCardModel(dto: StockHistoryDto): StockEntry {
+export function toCardModel(dto: StockHistoryDto, addTime: boolean): StockEntry {
     const labelStatus = generateExpiredLabel(new Date(dto.expiration_date));
     return {
         batchId: dto.batch_id,
@@ -36,9 +36,9 @@ export function toCardModel(dto: StockHistoryDto): StockEntry {
             dto.created_by_model === 'Staff'
                 ? ((dto.stock_created_by as StaffCreatedBy)?.staff_name ?? '')
                 : ((dto.stock_created_by as RestaurantCreatedBy)?.restaurant_name ?? ''),
-        entryDate: formatDate(dto.entry_date),
+        entryDate: formatDate(dto.entry_date, addTime),
         entryType: dto.entry_type,
-        expirationDate: formatDate(dto.expiration_date),
+        expirationDate: formatDate(dto.expiration_date, addTime),
         expirationLabel: dto.expiration_date ? labelStatus : undefined,
         additionalNotes: dto.additional_notes || undefined,
     };
