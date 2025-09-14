@@ -29,13 +29,11 @@ const StockForm = ({
 
     return (
         <form action={formAction} className="space-y-4">
-            {/* hidden shared values */}
             <input type="hidden" name="productId" defaultValue={productId} />
             <input type="hidden" name="measurementUnit" defaultValue={measurementUnit} />
             <input type="hidden" name="currentStock" defaultValue={currentStock} />
             <input type="hidden" name="entryType" defaultValue={entryType} />
 
-            {/* shared quantity input */}
             <Inputs
                 name="quantity"
                 label="Quantity"
@@ -43,6 +41,7 @@ const StockForm = ({
                 placeholder="Enter quantity"
                 error={state?.errors?.quantity?.[0]}
                 defaultValue={state?.values?.quantity ?? ''}
+                min={0}
                 required
             />
 
@@ -62,6 +61,7 @@ const StockForm = ({
                         label="Additional Notes"
                         placeholder="Enter any additional notes about the stock..."
                         defaultValue={state?.values?.additionalNotes ?? ''}
+                        error={state?.errors?.additionalNotes?.[0] ?? ''}
                     />
                 </>
             ) : (
@@ -71,6 +71,7 @@ const StockForm = ({
                     label="Reason for Removal"
                     placeholder="Enter the reason for removal"
                     defaultValue={state?.values?.reason ?? ''}
+                    error={state?.errors?.reason?.[0] ?? ''}
                 />
             )}
 

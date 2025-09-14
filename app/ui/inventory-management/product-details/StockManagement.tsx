@@ -113,14 +113,6 @@ const StockManagement = ({ productId, measurementUnit, currentStock }: Props) =>
                         </div>
                     </div>
                 </div>
-
-                {/* <div ref={contentRef} className="bg-white p-8">
-                        <StockEntryBarcode
-                            batchId={'#A0001'}
-                            entryId={'entry.entryId'}
-                            className="mx-auto"
-                        />
-                    </div> */}
             </div>
         </>
     );
