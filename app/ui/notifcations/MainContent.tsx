@@ -1,25 +1,33 @@
 'use client';
-import jsonData from '@/utils/data.json';
 
 import { useState } from 'react';
 import NotificationListItem from './NotificationListItem';
 import EmptyState from './EmptyState';
 import NotificationDetails from './NotificationDetails';
+import type { NotificationModel } from 'app/lib/types';
+import { deleteNotification, markNotificationAsRead } from 'app/lib/actions/notification.actions';
 
-const MainContent = () => {
+type Props = {
+    initialNotifications: NotificationModel[];
+};
+
+const MainContent = ({ initialNotifications }: Props) => {
     const [showNotificationDetails, setShowNotificationDetails] = useState(false);
-    const [selectedNotification, setSelectedNotification] = useState<number | null>(null);
+    const [selectedNotification, setSelectedNotification] = useState<string | null>(null);
 
-    const [notificationsList, setNotificationsList] = useState(jsonData);
-    const handleMarkAsRead = (id: number) => {
+    const [notificationsList, setNotificationsList] =
+        useState<NotificationModel[]>(initialNotifications);
+    const handleMarkAsRead = async (id: string) => {
+        await markNotificationAsRead(id);
         setNotificationsList(prevNotifications =>
             prevNotifications.map(notification =>
                 notification.id === id ? { ...notification, isRead: true } : notification,
             ),
         );
     };
-    const handleDeleteNotification = (id: number, e: React.MouseEvent) => {
+    const handleDeleteNotification = async (id: string, e: React.MouseEvent) => {
         e.stopPropagation();
+        await deleteNotification(id);
         setNotificationsList(prevNotifications =>
             prevNotifications.filter(notification => notification.id !== id),
         );

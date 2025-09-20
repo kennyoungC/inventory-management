@@ -10,13 +10,13 @@ import type { MongoDuplicateError, StaffModel } from '../types';
 import { generateUniqueCode } from 'app/utils/generateCode';
 import { MapMongoDuplicateError } from '@/utils/mongoDuplicateError';
 
-type valueName = 'email' | 'jobTitle' | 'fullName' | 'general';
-
+type StaffInput = z.infer<typeof FormSchema>;
+type ValueName = keyof StaffInput;
 export type State = {
-    errors?: Partial<Record<valueName, string[]>>;
+    errors?: Partial<Record<ValueName, string[]>>;
     success?: boolean;
     message?: string;
-    values?: Partial<Record<valueName, string>>;
+    values?: Partial<Record<ValueName, string>>;
 } | null;
 
 const fieldNameMap: Record<string, string> = {
@@ -26,6 +26,7 @@ const FormSchema = z.object({
     email: z.string().email({ message: 'Please enter a valid email.' }).trim(),
     jobTitle: z.string().min(1, 'Job title is required').trim(),
     fullName: z.string().min(1, 'Full name is required').trim(),
+    general: z.string().optional(),
 });
 
 export async function addNewStaff(prevState: State, formData: FormData): Promise<State> {
@@ -186,11 +187,7 @@ export async function getAllStaff(): Promise<StaffModel[]> {
             jobTitle: staff.job_title,
             isActive: staff.is_active,
             email: staff.email,
-            lastLoginAt: staff.last_login_at
-                ? staff.last_login_at instanceof Date
-                    ? staff.last_login_at.toISOString()
-                    : String(staff.last_login_at)
-                : undefined,
+            lastLoginAt: staff.last_login_at?.toISOString() ?? '',
         }));
     } catch (error) {
         console.error('Error in getAllStaff:', error);

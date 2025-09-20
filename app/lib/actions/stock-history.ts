@@ -1,7 +1,7 @@
 'use server';
 
 import StockHistory from '@/models/stock-history';
-import Product from '@/models/product';
+import Product, { ProductDto } from '@/models/product';
 import { generateEntryId } from '@/utils/generateCode';
 import dbConnect from '../db';
 import { auth } from 'auth';
@@ -9,23 +9,15 @@ import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { generateBatchId } from '@/utils/batchId';
 import { getCodeSession } from '../session';
+import { handleNotifications } from '@/utils/handleNotification';
 
-type valueName =
-    | 'entryType'
-    | 'productId'
-    | 'quantity'
-    | 'additionalNotes'
-    | 'expirationDate'
-    | 'currentStock'
-    | 'measurementUnit'
-    | 'general'
-    | 'reason';
-
+type StockHistoryInput = z.infer<typeof StockHistorySchema>;
+type ValueName = keyof StockHistoryInput;
 export type StockHistoryState = {
-    errors?: Partial<Record<valueName, Array<string>>>;
+    errors?: Partial<Record<ValueName, Array<string>>>;
     success?: boolean;
     message?: string;
-    values?: Partial<Record<valueName, string>>;
+    values?: Partial<Record<ValueName, string>>;
 } | null;
 
 const StockHistorySchema = z
@@ -36,8 +28,12 @@ const StockHistorySchema = z
         additionalNotes: z.string().max(500).optional(),
         measurementUnit: z.string().min(1, 'Measurement unit is required'),
         currentStock: z.coerce.number().min(0, 'Current stock must be at least 0'),
-        expirationDate: z.coerce.date().optional(),
+        expirationDate: z.preprocess(
+            val => (val ? new Date(String(val)) : undefined),
+            z.date().optional(),
+        ),
         reason: z.string().max(500).optional(),
+        general: z.string().optional(),
     })
     .superRefine((data, ctx) => {
         if (data.entryType === 'removal' && !data.reason) {
@@ -64,17 +60,15 @@ export async function createStockEntry(
     _prevState: StockHistoryState,
     formData: FormData,
 ): Promise<StockHistoryState> {
-    const data = Object.fromEntries(formData.entries());
-    console.log('Form Data:', data);
+    const data = Object.fromEntries(formData.entries()) as Partial<Record<ValueName, string>>;
 
     const validateFields = StockHistorySchema.safeParse(data);
 
     if (!validateFields.success) {
-        console.log('Validated Data:', validateFields.error.flatten().fieldErrors);
         return {
             errors: validateFields.error.flatten().fieldErrors,
             message: 'Validation failed',
-            values: data,
+            values: data as Partial<Record<ValueName, string>>,
         };
     }
 
@@ -90,26 +84,23 @@ export async function createStockEntry(
     } = validateFields.data;
 
     try {
-        const session = await auth();
+        const [session, codeSession] = await Promise.all([auth(), getCodeSession()]);
         const restaurantId = session?.user.id;
 
         if (!restaurantId) {
             return { errors: { general: ['Authentication required'] }, message: 'Not authorized' };
         }
-        const codeSession = await getCodeSession();
         await dbConnect();
 
         const entryId = generateEntryId();
         const batchId = await generateBatchId(entryType, restaurantId, productId);
 
         const stockChange = entryType === 'addition' ? quantity : -quantity;
-        const newStock = currentStock + stockChange;
+        const totalStock = currentStock + stockChange;
 
-        if (entryType === 'removal' && newStock < 0) {
+        if (entryType === 'removal' && totalStock < 0) {
             return {
-                errors: {
-                    quantity: ['Insufficient stock available, Please add stock before removing'],
-                },
+                errors: { quantity: ['Insufficient stock available'] },
                 message: 'Cannot remove more stock than available',
             };
         }
@@ -127,14 +118,33 @@ export async function createStockEntry(
             batch_id: batchId,
             additional_notes: additionalNotes ?? '',
             previous_stock: currentStock,
-            new_stock: newStock,
+            new_stock: totalStock,
             reason: reason ?? '',
             expiration_date: entryType === 'addition' && expirationDate ? expirationDate : null,
         });
+        const productDoc = await Product.findByIdAndUpdate(
+            productId,
+            { current_stock_level: totalStock },
+            { new: true, select: 'name minimum_stock_level' },
+        ).lean<ProductDto>();
 
-        await Product.findByIdAndUpdate(productId, {
-            current_stock_level: newStock,
-        });
+        if (productDoc) {
+            try {
+                await handleNotifications({
+                    productId,
+                    restaurantId,
+                    productName: productDoc.name,
+                    totalStock,
+                    measurementUnit,
+                    entryType,
+                    expirationDate,
+                    currentStock,
+                    minimumLevel: productDoc.minimum_stock_level,
+                });
+            } catch (err) {
+                console.error('Notification error:', err);
+            }
+        }
 
         revalidatePath(`/dashboard/inventory-management/product-details/${productId}`);
         return {

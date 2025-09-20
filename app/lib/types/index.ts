@@ -132,3 +132,18 @@ export type StockEntry = {
 };
 
 export type LabelStatus = 'Expired' | 'Expiring soon' | 'Valid';
+
+export type NotificationType = 'ai_agent' | 'inventory';
+
+export interface NotificationModel {
+    id: string;
+    restaurantId: string;
+    title: string;
+    message: string;
+    type: NotificationType;
+    isRead: boolean;
+    isUrgent: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    contextUrl?: string;
+}

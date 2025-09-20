@@ -9,20 +9,13 @@ import {
     FaTimes,
     FaTrashAlt,
 } from 'react-icons/fa';
+import type { NotificationModel } from 'app/lib/types';
 
 type Props = {
-    selectedNotificationDetails: {
-        id: number;
-        title: string;
-        message: string;
-        type: string;
-        timestamp: string;
-        isRead: boolean;
-        isUrgent: boolean;
-    };
+    selectedNotificationDetails: NotificationModel;
     setShowNotificationDetails: (show: boolean) => void;
-    handleMarkAsRead: (id: number) => void;
-    handleDeleteNotification: (id: number, e: React.MouseEvent) => void;
+    handleMarkAsRead: (id: string) => void;
+    handleDeleteNotification: (id: string, e: React.MouseEvent) => void;
 };
 
 const NotificationDetails = ({
@@ -31,7 +24,7 @@ const NotificationDetails = ({
     handleMarkAsRead,
     handleDeleteNotification,
 }: Props) => {
-    const getNotificationIcon = (type: string) => {
+    const getNotificationIcon = (type: NotificationModel['type']) => {
         switch (type) {
             case 'ai_agent':
                 return <FaRobot className="text-purple-500" />;
@@ -66,7 +59,7 @@ const NotificationDetails = ({
                                 {selectedNotificationDetails.title}
                             </h3>
                             <p className="text-gray-500 text-sm">
-                                {new Date(selectedNotificationDetails.timestamp).toLocaleString(
+                                {new Date(selectedNotificationDetails.createdAt).toLocaleString(
                                     'en-US',
                                     {
                                         weekday: 'long',
