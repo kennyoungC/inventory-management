@@ -1,8 +1,6 @@
 import { LabelStatus } from '@/types/index';
 
 export function getInitials(input: string): string {
-    console.log({ input });
-
     if (!input) return '';
 
     const words = input.trim().split(/\s+|-/).filter(Boolean);

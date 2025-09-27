@@ -61,7 +61,6 @@ const ProductSchema = z
             .string()
             .optional()
             .transform(val => val?.toLowerCase()),
-        supplierMinimumOrderQuantity: z.string().optional(),
     })
     .superRefine((data, ctx) => {
         if (data.supplierType === 'external' && data.supplierSelection === 'new') {
@@ -93,13 +92,6 @@ const ProductSchema = z
                     code: z.ZodIssueCode.custom,
                 });
             }
-            if (!data.supplierMinimumOrderQuantity) {
-                ctx.addIssue({
-                    path: ['supplierMinimumOrderQuantity'],
-                    message: 'Minimum order is required',
-                    code: z.ZodIssueCode.custom,
-                });
-            }
         } else if (data.supplierType === 'external' && data.supplierSelection === 'existing') {
             if (!data.existingSupplierId) {
                 ctx.addIssue({
@@ -115,6 +107,7 @@ export async function createProduct(_prevState: State, formData: FormData): Prom
     const data = Object.fromEntries(formData.entries());
 
     const validateFields = ProductSchema.safeParse(data);
+
     if (!validateFields.success) {
         return {
             errors: validateFields.error.flatten().fieldErrors,
@@ -136,7 +129,6 @@ export async function createProduct(_prevState: State, formData: FormData): Prom
         additionalNotes,
         supplierType,
         supplierSelection,
-        supplierMinimumOrderQuantity,
         existingSupplierId,
     } = validateFields.data;
 
@@ -190,7 +182,6 @@ export async function createProduct(_prevState: State, formData: FormData): Prom
                 supplier_contact_person: supplierContactPerson,
                 supplier_phone_number: supplierPhoneNumber,
                 supplier_email: supplierEmail,
-                supplier_minimum_order_quantity: Number(supplierMinimumOrderQuantity),
                 restaurant_id: session?.user?.id,
             });
             supplierIdToUse = created._id.toString();

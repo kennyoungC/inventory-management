@@ -268,19 +268,6 @@ const CreateNewProduct = ({ onClose, supplierOptions }: Props) => {
                                                 defaultValue={state?.values?.supplierEmail}
                                                 error={state?.errors?.supplierEmail?.[0]}
                                             />
-                                            <Inputs
-                                                label="Minimum Order"
-                                                name="supplierMinimumOrderQuantity"
-                                                placeholder="Enter minimum order"
-                                                defaultValue={
-                                                    state?.values?.supplierMinimumOrderQuantity
-                                                }
-                                                error={
-                                                    state?.errors?.supplierMinimumOrderQuantity?.[0]
-                                                }
-                                                type="number"
-                                                onKeyDown={handleKeyDown}
-                                            />
                                         </div>
                                     )}
                                 </div>

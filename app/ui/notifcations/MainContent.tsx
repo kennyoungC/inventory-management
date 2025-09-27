@@ -12,8 +12,6 @@ type Props = {
 };
 
 const MainContent = ({ initialNotifications }: Props) => {
-    console.log('Initial Notifications:', initialNotifications);
-
     const [showNotificationDetails, setShowNotificationDetails] = useState(false);
     const [selectedNotification, setSelectedNotification] = useState<string | null>(null);
 

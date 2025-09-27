@@ -21,8 +21,6 @@ export async function generateAiNotification({
 
         const restaurant = await Restaurant.findById(restaurantId).select('restaurant_name');
 
-        console.log({ productWithSupplier, restaurant });
-
         if (!restaurant || !productWithSupplier) return;
 
         const supplier = productWithSupplier.supplier;
