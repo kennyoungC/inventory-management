@@ -16,7 +16,6 @@ const SupplierInformation = ({ supplier }: Props) => {
                 <InfoRow label="Contact Person" value={supplier.contactPerson} />
                 <InfoRow label="Phone" value={supplier.phone} />
                 <InfoRow label="Email" value={supplier.email} />
-                <InfoRow label="Minimum Order" value={supplier.minimumOrderQuantity} />
             </div>
         </div>
     );

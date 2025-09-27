@@ -20,7 +20,12 @@ const ProductDetails = async ({ productId }: Props) => {
     const { additions, removals } = await getStockHistoryCardData(productId);
 
     if (!productWithSupplier) {
-        return <div>Product not found</div>;
+        return (
+            <div>
+                <HeaderBar title="Inventory Management System" />
+                <p> Product not found</p>
+            </div>
+        );
     }
 
     return (
@@ -54,7 +59,7 @@ const ProductDetails = async ({ productId }: Props) => {
                             supplier={
                                 productWithSupplier.supplier?.contactPerson || 'Internal Stock'
                             }
-                            recommendedTemp="2°C - 8°C"
+                            //recommendedTemp="2°C - 8°C"
                             specialHandling={productWithSupplier.additionalNotes || 'N/A'}
                         />
 

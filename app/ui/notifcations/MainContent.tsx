@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import NotificationListItem from './NotificationListItem';
 import EmptyState from './EmptyState';
 import NotificationDetails from './NotificationDetails';
@@ -15,23 +15,26 @@ const MainContent = ({ initialNotifications }: Props) => {
     const [showNotificationDetails, setShowNotificationDetails] = useState(false);
     const [selectedNotification, setSelectedNotification] = useState<string | null>(null);
 
-    const handleMarkAsRead = async (id: string) => {
+    const handleMarkAsRead = useCallback(async (id: string) => {
         await markNotificationAsRead(id);
-    };
+    }, []);
 
-    const handleCloseDetails = () => {
+    const handleCloseDetails = useCallback(() => {
         setShowNotificationDetails(false);
         setSelectedNotification(null);
-    };
+    }, []);
 
-    const handleDeleteNotification = async (id: string, e: React.MouseEvent) => {
-        e.stopPropagation();
-        await deleteNotification(id);
+    const handleDeleteNotification = useCallback(
+        async (id: string, e: React.MouseEvent) => {
+            e.stopPropagation();
+            await deleteNotification(id);
 
-        if (selectedNotification === id) {
-            handleCloseDetails();
-        }
-    };
+            if (selectedNotification === id) {
+                handleCloseDetails();
+            }
+        },
+        [selectedNotification, handleCloseDetails],
+    );
 
     const selectedNotificationDetails = useMemo(() => {
         return selectedNotification

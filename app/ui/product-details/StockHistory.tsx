@@ -26,7 +26,7 @@ const StockHistory = ({ stockHistory }: { stockHistory: StockEntry[] }) => {
                 <div className="flex gap-2">
                     <button
                         onClick={() => setFilter('all')}
-                        className={`px-4 py-2 text-sm font-medium rounded-lg border transition-colors ${
+                        className={`px-4 py-2 cursor-pointer text-sm font-medium rounded-lg border transition-colors ${
                             filter === 'all'
                                 ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
                                 : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
@@ -36,7 +36,7 @@ const StockHistory = ({ stockHistory }: { stockHistory: StockEntry[] }) => {
                     </button>
                     <button
                         onClick={() => setFilter('addition')}
-                        className={`px-4 py-2 text-sm font-medium rounded-lg border transition-colors flex items-center gap-2 ${
+                        className={`px-4 py-2 cursor-pointer text-sm font-medium rounded-lg border transition-colors flex items-center gap-2 ${
                             filter === 'addition'
                                 ? 'bg-green-600 border-green-600 text-white shadow-sm'
                                 : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
@@ -47,7 +47,7 @@ const StockHistory = ({ stockHistory }: { stockHistory: StockEntry[] }) => {
                     </button>
                     <button
                         onClick={() => setFilter('removal')}
-                        className={`px-4 py-2 text-sm font-medium rounded-lg border transition-colors flex items-center gap-2 ${
+                        className={`px-4 py-2 cursor-pointer text-sm font-medium rounded-lg border transition-colors flex items-center gap-2 ${
                             filter === 'removal'
                                 ? 'bg-red-600 border-red-600 text-white shadow-sm'
                                 : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'

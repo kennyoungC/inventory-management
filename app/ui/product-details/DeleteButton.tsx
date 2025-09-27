@@ -14,7 +14,7 @@ const DeleteButton = ({ productId }: { productId: string }) => {
             if (result?.success) {
                 router.push('/dashboard/product-management');
             } else {
-                toast.error(result?.message || 'Failed to delete product');
+                toast.error(result?.message ?? 'Failed to delete product');
 
                 return;
             }

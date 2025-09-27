@@ -9,7 +9,6 @@ export function transformSupplierDto(dto: SupplierDto): supplierModel {
         contactPerson: dto.supplier_contact_person,
         phone: dto.supplier_phone_number,
         email: dto.supplier_email,
-        minimumOrderQuantity: dto.supplier_minimum_order_quantity,
     };
 }
 
