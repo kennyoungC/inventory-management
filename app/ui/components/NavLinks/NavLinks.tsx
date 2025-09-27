@@ -35,11 +35,13 @@ const NavLinks = ({ count, isAdmin }: { count: number; isAdmin: boolean }) => {
           `}
                 >
                     {item.name === 'Notifications' ? (
-                        <div className="relative">
+                        <div className="relative flex items-center justify-center w-6 h-6 shrink-0">
                             <Image src={item.icon} alt={item.name} width={23} height={23} />
-                            <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                                {count}
-                            </span>
+                            {count > 0 && (
+                                <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                                    {count}
+                                </span>
+                            )}
                         </div>
                     ) : (
                         <Image src={item.icon} alt={item.name} width={23} height={23} />
