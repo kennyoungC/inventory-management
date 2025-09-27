@@ -66,3 +66,11 @@ export const measurementUnitsGrouped: SelectGroupOption[] = [
         ],
     },
 ];
+
+export const categories = [
+    { value: 'wine-spirits', label: 'Wine & Spirits' },
+    { value: 'meat-poultry', label: 'Meat & Poultry' },
+    { value: 'fresh-produce', label: 'Fresh Produce' },
+    { value: 'dairy-eggs', label: 'Dairy & Eggs' },
+    { value: 'pantry-items', label: 'Pantry Items' },
+];

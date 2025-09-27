@@ -1,5 +1,6 @@
 import InfoRow from '@/components/InfoRow';
 import { ProductWithSupplierModel } from '@/types/index';
+import { categories } from '@/types/measureUnits';
 import React from 'react';
 
 type Props = {
@@ -18,7 +19,10 @@ const StockInformation = ({ product }: Props) => {
                     value={product.currentStock}
                     valueClassName="text-lg !font-bold !text-gray-900"
                 />
-                <InfoRow label="Category" value={product.category} />
+                <InfoRow
+                    label="Category"
+                    value={categories.find(category => category.value === product.category)?.label}
+                />
                 <InfoRow
                     label="Status"
                     valueClassName={`${product.currentStock > product.minimumStockLevel ? 'text-green-700 bg-green-100' : 'text-yellow-700 bg-yellow-100'} px-2.5 py-0.5 rounded-full text-xs font-bold`}

@@ -7,7 +7,6 @@ export interface SupplierDto extends Document {
     supplier_contact_person?: string;
     supplier_phone_number: string;
     supplier_email: string;
-    supplier_minimum_order_quantity: number;
     restaurant_id: Schema.Types.ObjectId;
 }
 
@@ -42,11 +41,6 @@ const SupplierSchema = new Schema<SupplierDto>(
             lowercase: true,
             trim: true,
             validate: [validator.isEmail, 'Please provide a valid email'],
-        },
-        supplier_minimum_order_quantity: {
-            type: Number,
-            required: [true, 'Please provide a minimum order quantity for this supplier.'],
-            min: [1, 'Minimum order quantity must be at least 1'],
         },
         restaurant_id: {
             type: Schema.Types.ObjectId,

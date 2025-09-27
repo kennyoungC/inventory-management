@@ -5,17 +5,9 @@ import Inputs from '@/components/Inputs';
 import Loader from '@/components/Loader';
 import SelectInput from '@/components/SelectInput/SelectInput';
 import { ProductWithSupplierModel, supplierModel } from '@/types/index';
-import { measurementUnitsGrouped, SelectOption } from '@/types/measureUnits';
+import { categories, measurementUnitsGrouped, SelectOption } from '@/types/measureUnits';
 import { useActionState, useEffect, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
-
-const categories = [
-    { value: 'wine-spirits', label: 'Wine & Spirits' },
-    { value: 'meat-poultry', label: 'Meat & Poultry' },
-    { value: 'fresh-produce', label: 'Fresh Produce' },
-    { value: 'dairy-eggs', label: 'Dairy & Eggs' },
-    { value: 'pantry-items', label: 'Pantry Items' },
-];
 
 type Props = {
     onClose: () => void;

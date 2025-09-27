@@ -84,8 +84,6 @@ export async function createStockEntry(
         const stockChange = entryType === 'addition' ? quantity : -quantity;
         const totalStock = currentStock + stockChange;
 
-        console.log({ totalStock });
-
         if (entryType === 'removal' && totalStock < 0) {
             return {
                 errors: { quantity: ['Insufficient stock available'] },

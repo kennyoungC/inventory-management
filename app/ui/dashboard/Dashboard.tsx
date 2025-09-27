@@ -1,21 +1,26 @@
 import HeaderBar from 'app/shared/components/HeaderBar';
+import { Suspense } from 'react';
+import CardWrapper from './Cards';
 
 const Dashboard = () => {
     return (
         <div>
             <HeaderBar title="Dashboard Page" />
-            <p>
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab dolore cumque
-                aspernatur fugit cum quas! Molestias consectetur architecto adipisci impedit
-                repudiandae nesciunt id distinctio ducimus totam! Voluptatem aliquid at numquam
-                minus excepturi rem harum porro a, consectetur illum eum nisi quasi hic, ab non
-                laboriosam, totam iusto praesentium recusandae! Nemo deserunt aut molestias
-                asperiores ab vitae officiis quidem, temporibus distinctio excepturi corporis, hic
-                dignissimos exercitationem natus sit, aliquam error ullam at accusamus magni.
-                Architecto saepe dolorem est numquam animi repudiandae eum ullam ducimus cupiditate
-                voluptates hic cum, quaerat alias pariatur quod aperiam distinctio velit possimus
-                quae accusantium at necessitatibus voluptate!
-            </p>
+            <main className="min-h-screen bg-gray-50 py-8 px-8">
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                    <Suspense fallback={<CardWrapper />}>
+                        <CardWrapper />
+                    </Suspense>
+                </div>
+                {/* <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-4 lg:grid-cols-8">
+                    <Suspense fallback={<RevenueChartSkeleton />}>
+                        <RevenueChart />
+                    </Suspense>
+                    <Suspense fallback={<LatestInvoicesSkeleton />}>
+                        <LatestInvoices />
+                    </Suspense>
+                </div> */}
+            </main>
         </div>
     );
 };

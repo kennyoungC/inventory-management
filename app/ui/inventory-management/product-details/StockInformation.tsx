@@ -2,7 +2,7 @@ type StockInfoProps = {
     currentStock: string;
     storageType: string;
     supplier: string;
-    recommendedTemp: string;
+    recommendedTemp?: string;
     specialHandling: string;
 };
 
@@ -10,7 +10,7 @@ const StockInformation = ({
     currentStock,
     storageType,
     supplier,
-    recommendedTemp,
+    // recommendedTemp,
     specialHandling,
 }: StockInfoProps) => {
     return (
@@ -33,10 +33,10 @@ const StockInformation = ({
                     <p className="font-semibold text-gray-900">{supplier}</p>
                 </div>
 
-                <div>
+                {/* <div>
                     <p className="text-sm text-gray-500">Recommended Storage Temperature</p>
                     <p className="font-semibold text-gray-900">{recommendedTemp}</p>
-                </div>
+                </div> */}
             </div>
 
             {/* Special Handling */}

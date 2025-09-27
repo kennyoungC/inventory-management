@@ -10,7 +10,7 @@ import {
     FaTimes,
     FaTrashAlt,
 } from 'react-icons/fa';
-import type { NotificationModel } from 'app/lib/types';
+import type { NotificationModel, NotificationType } from 'app/lib/types';
 import Link from 'next/link';
 
 type Props = {
@@ -26,7 +26,7 @@ const NotificationDetails = ({
     handleMarkAsRead,
     handleDeleteNotification,
 }: Props) => {
-    const getNotificationIcon = (type: NotificationModel['type']) => {
+    const getNotificationIcon = (type: NotificationType) => {
         switch (type) {
             case 'ai_agent':
                 return <FaRobot className="text-purple-500" />;

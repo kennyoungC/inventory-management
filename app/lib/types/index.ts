@@ -65,7 +65,6 @@ export type supplierModel = {
     email: string;
     phone: string;
     contactPerson?: string;
-    minimumOrderQuantity: string | number;
 };
 
 export type ProductWithSupplierDto = {
