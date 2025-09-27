@@ -14,7 +14,7 @@ import {
 import CreateNewProduct from './CreateNewProduct';
 import Link from 'next/link';
 import { ProductModel, supplierModel } from '@/types/index';
-import { prettyCategory } from '@/utils/getInitials';
+import { prettyCategory } from 'app/shared/utils/textUtils';
 
 const categories = [
     { label: 'All Items', icon: null, id: 'all' },
@@ -64,7 +64,6 @@ export default function MainContent({ suppliers, products }: Props) {
         setShowAddProductForm(false);
     };
 
-    // Get the selected category label for empty state
     const selectedCategoryLabel =
         categories.find(cat => cat.id === selectedCategory)?.label || 'All Items';
 
@@ -102,7 +101,6 @@ export default function MainContent({ suppliers, products }: Props) {
                     </button>
                 </div>
 
-                {/* Products Grid or Empty State */}
                 {filteredProducts.length > 0 ? (
                     <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                         {filteredProducts.map(prod => (
@@ -143,7 +141,6 @@ export default function MainContent({ suppliers, products }: Props) {
                         ))}
                     </div>
                 ) : (
-                    /* Empty State */
                     <div className="flex flex-col items-center justify-center py-5 px-4">
                         <div className="w-20 h-20 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
                             {selectedCategory === 'all' ? (
@@ -186,7 +183,6 @@ export default function MainContent({ suppliers, products }: Props) {
                             )}
                         </div>
 
-                        {/* Optional: Show category suggestions when no products in category */}
                         {selectedCategory !== 'all' && products.length > 0 && (
                             <div className="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
                                 <p className="text-sm text-blue-700 mb-2">

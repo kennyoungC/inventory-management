@@ -1,4 +1,4 @@
-import { getCurrentSessionUser } from '@/actions/current-session-user.actions';
+import { getCurrentSessionUser } from '@/data/session';
 
 export default async function User() {
     const user = await getCurrentSessionUser();

@@ -1,6 +1,6 @@
 import GoBack from '@/components/Buttons/GoBack';
-import { capitalizeFirstLetter, prettyCategory } from '@/utils/getInitials';
-import HeaderBar from '@/ui/HeaderBar';
+import { capitalizeFirstLetter, prettyCategory } from 'app/shared/utils/textUtils';
+import HeaderBar from 'app/shared/components/HeaderBar';
 
 import { FaWineGlass } from 'react-icons/fa';
 import StockInformation from './StockInformation';

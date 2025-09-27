@@ -1,4 +1,4 @@
-import HeaderBar from '@/ui/HeaderBar';
+import HeaderBar from 'app/shared/components/HeaderBar';
 import MainContent from './MainContent';
 
 const InventoryManagement = () => {

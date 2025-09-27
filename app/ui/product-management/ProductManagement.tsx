@@ -1,5 +1,5 @@
 import { getAllProducts } from '@/data/product';
-import HeaderBar from '../HeaderBar';
+import HeaderBar from '../../shared/components/HeaderBar';
 import MainContent from './MainContent';
 import { getAllSuppliers } from '@/data/supplier';
 

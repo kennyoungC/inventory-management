@@ -23,11 +23,7 @@ export default auth(async function middleware(req: NextRequest) {
         }
 
         // Restrict certain routes for staff
-        const staffRestrictedRoutes = [
-            '/dashboard/settings',
-            '/dashboard/staff-management',
-            '/dashboard/notifications',
-        ];
+        const staffRestrictedRoutes = ['/dashboard/settings', '/dashboard/staff-management'];
         if (
             codeSession.type === 'staff' &&
             staffRestrictedRoutes.some(route => pathname.startsWith(route))

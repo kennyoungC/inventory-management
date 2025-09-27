@@ -1,8 +1,8 @@
-// utils/batchId.ts
-
-import StockHistory, { StockHistoryDto } from '@/models/stock-history';
-import { SectionType } from '@/types/index';
 import dbConnect from 'app/lib/db';
+import { getInitials } from 'app/shared/utils/textUtils';
+import SkuCounter from '@/models/sku-counter';
+import StockHistory from '@/models/stock-history';
+import type { SectionType } from '@/types/index';
 
 export async function generateBatchId(
     entryType: SectionType,
@@ -20,8 +20,7 @@ export async function generateBatchId(
             batch_id: { $regex: `^${prefix}\\d{3}$` },
         })
             .sort({ batch_id: -1 })
-            .select('batch_id')
-            .lean<StockHistoryDto>();
+            .select('batch_id');
 
         let nextNumber = 1;
 
@@ -40,4 +39,17 @@ export async function generateBatchId(
         const timestamp = Date.now().toString().slice(-3);
         return `${prefix}${timestamp}`;
     }
+}
+
+export async function generateSKU(name: string, category: string, restaurantId: string) {
+    await dbConnect();
+
+    const counter = await SkuCounter.findOneAndUpdate(
+        { category, restaurant_id: restaurantId },
+        { $inc: { lastSequence: 1 } },
+        { new: true, upsert: true },
+    );
+
+    const sequence = counter.lastSequence.toString().padStart(3, '0');
+    return `${getInitials(name)}-${getInitials(category)}-${sequence}`;
 }

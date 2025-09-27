@@ -1,8 +1,8 @@
-import HeaderBar from '@/ui/HeaderBar';
+import HeaderBar from 'app/shared/components/HeaderBar';
 import RestaurantProfileForm from './forms/RestaurantProfile';
 import ChangePasswordForm from './forms/ChangePassword';
 import AccessCodeForm from './forms/AccessCode';
-import { getRestaurantById } from '@/actions/restaurant.action';
+import { getRestaurantById } from '@/data/restaurant';
 
 export default async function Settings() {
     const restaurant = await getRestaurantById();

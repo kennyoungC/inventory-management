@@ -1,7 +1,7 @@
 'use client';
 
 import { ProductWithSupplierModel, supplierModel } from '@/types/index';
-import { capitalizeFirstLetter, prettyCategory } from '@/utils/getInitials';
+import { capitalizeFirstLetter, prettyCategory } from 'app/shared/utils/textUtils';
 import { FaEdit, FaWineGlass } from 'react-icons/fa';
 import DeleteButton from './DeleteButton';
 import { useState } from 'react';
@@ -11,9 +11,10 @@ import GoBack from '@/components/Buttons/GoBack';
 type Props = {
     product: ProductWithSupplierModel;
     suppliers: supplierModel[];
+    isAdmin: boolean;
 };
 
-const ProductHeaderDetails = ({ product, suppliers }: Props) => {
+const ProductHeaderDetails = ({ product, suppliers, isAdmin }: Props) => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     return (
@@ -35,16 +36,18 @@ const ProductHeaderDetails = ({ product, suppliers }: Props) => {
                         </div>
                     </div>
                 </div>
-                <div className="flex items-center gap-2">
-                    <button
-                        onClick={() => setIsEditModalOpen(true)}
-                        className="flex gap-1 items-center cursor-pointer justify-center px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-sm shadow-sm hover:bg-blue-700"
-                    >
-                        <FaEdit />
-                        Edit Item
-                    </button>
-                    <DeleteButton productId={product.id} />
-                </div>
+                {isAdmin && (
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => setIsEditModalOpen(true)}
+                            className="flex gap-1 items-center cursor-pointer justify-center px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-sm shadow-sm hover:bg-blue-700"
+                        >
+                            <FaEdit />
+                            Edit Item
+                        </button>
+                        <DeleteButton productId={product.id} />
+                    </div>
+                )}
             </header>
             {isEditModalOpen && (
                 <EditProduct

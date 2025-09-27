@@ -1,31 +1,25 @@
 'use server';
 
-import StockHistory from '@/models/stock-history';
-import Product from '@/models/product';
-import { generateEntryId } from '@/utils/generateCode';
-import dbConnect from '../db';
-import { auth } from 'auth';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
-import { generateBatchId } from '@/utils/batchId';
-import { getCodeSession } from '../session';
+import StockHistory from '@/models/stock-history';
+import Product, { ProductDto } from '@/models/product';
+import {
+    generateBatchId,
+    handleNotifications,
+    validateAuthentication,
+    generateEntryId,
+} from 'app/shared/utils';
+import dbConnect from '../db';
 
-type valueName =
-    | 'entryType'
-    | 'productId'
-    | 'quantity'
-    | 'additionalNotes'
-    | 'expirationDate'
-    | 'currentStock'
-    | 'measurementUnit'
-    | 'general'
-    | 'reason';
-
+type StockHistoryInput = z.infer<typeof StockHistorySchema>;
+type ValueName = keyof StockHistoryInput;
+type DataType = Partial<Record<ValueName, string>>;
 export type StockHistoryState = {
-    errors?: Partial<Record<valueName, Array<string>>>;
+    errors?: Partial<Record<ValueName, Array<string>>>;
     success?: boolean;
     message?: string;
-    values?: Partial<Record<valueName, string>>;
+    values?: DataType;
 } | null;
 
 const StockHistorySchema = z
@@ -36,8 +30,12 @@ const StockHistorySchema = z
         additionalNotes: z.string().max(500).optional(),
         measurementUnit: z.string().min(1, 'Measurement unit is required'),
         currentStock: z.coerce.number().min(0, 'Current stock must be at least 0'),
-        expirationDate: z.coerce.date().optional(),
+        expirationDate: z.preprocess(
+            val => (val ? new Date(String(val)) : undefined),
+            z.date().optional(),
+        ),
         reason: z.string().max(500).optional(),
+        general: z.string().optional(),
     })
     .superRefine((data, ctx) => {
         if (data.entryType === 'removal' && !data.reason) {
@@ -65,12 +63,10 @@ export async function createStockEntry(
     formData: FormData,
 ): Promise<StockHistoryState> {
     const data = Object.fromEntries(formData.entries());
-    console.log('Form Data:', data);
 
     const validateFields = StockHistorySchema.safeParse(data);
 
     if (!validateFields.success) {
-        console.log('Validated Data:', validateFields.error.flatten().fieldErrors);
         return {
             errors: validateFields.error.flatten().fieldErrors,
             message: 'Validation failed',
@@ -78,62 +74,37 @@ export async function createStockEntry(
         };
     }
 
-    const {
-        entryType,
-        productId,
-        quantity,
-        additionalNotes,
-        reason,
-        expirationDate,
-        currentStock,
-        measurementUnit,
-    } = validateFields.data;
+    const { entryType, productId, quantity, expirationDate, currentStock, measurementUnit } =
+        validateFields.data;
 
     try {
-        const session = await auth();
-        const restaurantId = session?.user.id;
-
-        if (!restaurantId) {
-            return { errors: { general: ['Authentication required'] }, message: 'Not authorized' };
-        }
-        const codeSession = await getCodeSession();
+        const { restaurantDetails } = await validateAuthentication();
         await dbConnect();
 
-        const entryId = generateEntryId();
-        const batchId = await generateBatchId(entryType, restaurantId, productId);
-
         const stockChange = entryType === 'addition' ? quantity : -quantity;
-        const newStock = currentStock + stockChange;
+        const totalStock = currentStock + stockChange;
 
-        if (entryType === 'removal' && newStock < 0) {
+        console.log({ totalStock });
+
+        if (entryType === 'removal' && totalStock < 0) {
             return {
-                errors: {
-                    quantity: ['Insufficient stock available, Please add stock before removing'],
-                },
+                errors: { quantity: ['Insufficient stock available'] },
                 message: 'Cannot remove more stock than available',
             };
         }
 
-        await StockHistory.create({
-            entry_id: entryId,
-            restaurant_id: restaurantId,
-            product_id: productId,
-            stock_created_by: codeSession?.id,
-            created_by_model: session.user.role === 'admin' ? 'Restaurant' : 'Staff',
-            entry_type: entryType,
-            entry_date: new Date(),
-            quantity: Math.abs(quantity),
-            measurement_unit: measurementUnit,
-            batch_id: batchId,
-            additional_notes: additionalNotes ?? '',
-            previous_stock: currentStock,
-            new_stock: newStock,
-            reason: reason ?? '',
-            expiration_date: entryType === 'addition' && expirationDate ? expirationDate : null,
-        });
+        const { productDoc } = await executeStockTransaction(validateFields.data, totalStock);
 
-        await Product.findByIdAndUpdate(productId, {
-            current_stock_level: newStock,
+        await handleNotifications({
+            productId,
+            restaurantId: restaurantDetails.id,
+            productName: productDoc.name,
+            totalStock,
+            measurementUnit,
+            entryType,
+            expirationDate,
+            currentStock,
+            minimumLevel: productDoc.minimum_stock_level,
         });
 
         revalidatePath(`/dashboard/inventory-management/product-details/${productId}`);
@@ -147,5 +118,74 @@ export async function createStockEntry(
             errors: { general: ['Failed to process stock entry'] },
             message: 'An error occurred',
         };
+    }
+}
+
+async function executeStockTransaction(validatedData: StockHistoryInput, totalStock: number) {
+    const {
+        entryType,
+        productId,
+        quantity,
+        additionalNotes,
+        reason,
+        expirationDate,
+        currentStock,
+        measurementUnit,
+    } = validatedData;
+
+    const { restaurantDetails, session, codeSession } = await validateAuthentication();
+
+    const connection = await dbConnect();
+    const mongoSession = await connection.connection.startSession();
+
+    try {
+        const result = await mongoSession.withTransaction(async () => {
+            const entryId = generateEntryId();
+            const batchId = await generateBatchId(entryType, restaurantDetails.id, productId);
+
+            const [stockHistoryEntry] = await StockHistory.create(
+                [
+                    {
+                        entry_id: entryId,
+                        restaurant_id: restaurantDetails.id,
+                        product_id: productId,
+                        stock_created_by: codeSession?.id,
+                        created_by_model: session.user.role === 'admin' ? 'Restaurant' : 'Staff',
+                        entry_type: entryType,
+                        entry_date: new Date(),
+                        quantity: Math.abs(quantity),
+                        measurement_unit: measurementUnit,
+                        batch_id: batchId,
+                        additional_notes: additionalNotes?.trim() ?? '',
+                        previous_stock: currentStock,
+                        new_stock: totalStock,
+                        reason: reason?.trim() ?? '',
+                        expiration_date:
+                            entryType === 'addition' && expirationDate ? expirationDate : null,
+                    },
+                ],
+                { session: mongoSession },
+            );
+
+            const productDoc = await Product.findByIdAndUpdate(
+                productId,
+                { current_stock_level: totalStock },
+                {
+                    new: true,
+                    select: 'name minimum_stock_level',
+                    session: mongoSession,
+                },
+            ).lean<ProductDto>();
+
+            if (!productDoc) {
+                throw new Error('Product not found or update failed');
+            }
+
+            return { stockHistoryEntry, productDoc };
+        });
+
+        return result;
+    } finally {
+        await mongoSession.endSession();
     }
 }

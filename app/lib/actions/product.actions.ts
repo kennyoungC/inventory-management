@@ -1,39 +1,23 @@
 'use server';
 
-import dbConnect from '../db';
+import { z } from 'zod';
+import { revalidatePath } from 'next/cache';
+import { auth } from 'auth';
 import Product, { ProductDto } from '@/models/product';
 import Supplier from '@/models/supplier';
-import { z } from 'zod';
-import { auth } from 'auth';
-import { revalidatePath } from 'next/cache';
-import type { MongoDuplicateError } from '../types';
-import { generateSKU } from './generateSKU';
-import { getCurrentSessionUser } from './current-session-user.actions';
-import { MapMongoDuplicateError } from '@/utils/mongoDuplicateError';
+import { getCurrentSessionUser } from '@/data/session';
+import { MapMongoDuplicateError, generateSKU } from 'app/shared/utils';
+import dbConnect from '../db';
+import { MongoDuplicateError } from '../types';
 
-type valueName =
-    | 'name'
-    | 'category'
-    | 'currentStock'
-    | 'measurementUnit'
-    | 'minimumStockLevel'
-    | 'storageLocation'
-    | 'additionalNotes'
-    | 'supplierType'
-    | 'supplierSelection'
-    | 'existingSupplierId'
-    | 'general'
-    | 'supplierName'
-    | 'supplierContactPerson'
-    | 'supplierPhoneNumber'
-    | 'supplierEmail'
-    | 'supplierMinimumOrderQuantity';
+type ProductInput = z.infer<typeof ProductSchema>;
+type ValueName = keyof ProductInput;
 
 export type State = {
-    errors?: Partial<Record<valueName, Array<string>>>;
+    errors?: Partial<Record<ValueName, Array<string>>>;
     success?: boolean;
     message?: string;
-    values?: Partial<Record<valueName, string>>;
+    values?: Partial<Record<ValueName, string>>;
 } | null;
 
 const fieldNameMap: Record<string, string> = {
@@ -59,6 +43,7 @@ const ProductSchema = z
         existingSupplierId: z.string().optional(),
         supplierName: z.string().optional(),
         supplierContactPerson: z.string().optional(),
+        general: z.string().optional(),
         supplierPhoneNumber: z
             .string()
             .optional()

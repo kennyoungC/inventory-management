@@ -1,21 +1,15 @@
-import { formatDateToRelative } from '@/utils/formatDate';
+// import { formatDateToRelative } from '@/utils/formatDate';
 import React from 'react';
 import { FaBell, FaBox, FaRobot } from 'react-icons/fa';
+import type { NotificationModel } from 'app/lib/types';
+import { formatDate } from 'app/shared/utils/dateUtils';
 
 type Props = {
-    notification: {
-        id: number;
-        title: string;
-        message: string;
-        type: string;
-        timestamp: string;
-        isRead: boolean;
-        isUrgent: boolean;
-    };
-    setSelectedNotification: (id: number) => void;
+    notification: NotificationModel;
+    setSelectedNotification: (id: string) => void;
     setShowNotificationDetails: (show: boolean) => void;
-    handleMarkAsRead: (id: number) => void;
-    selectedNotification: number | null;
+    handleMarkAsRead: (id: string) => void;
+    selectedNotification: string | null;
 };
 
 const NotificationListItem = ({
@@ -25,7 +19,7 @@ const NotificationListItem = ({
     handleMarkAsRead,
     selectedNotification,
 }: Props) => {
-    const getNotificationIcon = (type: string) => {
+    const getNotificationIcon = (type: NotificationModel['type']) => {
         switch (type) {
             case 'ai_agent':
                 return <FaRobot className="text-purple-500" />;
@@ -42,9 +36,6 @@ const NotificationListItem = ({
             onClick={() => {
                 setSelectedNotification(notification.id);
                 setShowNotificationDetails(true);
-                if (!notification.isRead) {
-                    handleMarkAsRead(notification.id);
-                }
             }}
             className={`bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden cursor-pointer ${
                 selectedNotification === notification.id ? 'ring-2 ring-blue-500' : ''
@@ -68,13 +59,13 @@ const NotificationListItem = ({
                                 )}
                             </h3>
                             <span className="text-xs text-gray-500">
-                                {formatDateToRelative(notification.timestamp)}
+                                {formatDate(notification.createdAt)}
                             </span>
                         </div>
                         <p
                             className={`text-sm ${!notification.isRead ? 'text-gray-800' : 'text-gray-600'} line-clamp-2`}
                         >
-                            {notification.message}
+                            {notification.summary}
                         </p>
                     </div>
                 </div>

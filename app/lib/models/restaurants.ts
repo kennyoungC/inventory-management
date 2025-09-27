@@ -59,7 +59,7 @@ const RestaurantSchema = new Schema<RestaurantDto>(
                 message:
                     'Password must contain at least one uppercase, one lowercase, one number, and one special character',
             },
-            select: false, // Never return password in queries
+            select: false,
         },
         address: {
             type: String,

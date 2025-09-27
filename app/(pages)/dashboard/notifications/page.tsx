@@ -1,3 +1,4 @@
+import { listNotifications } from '@/data/notification';
 import Notifications from 'app/ui/notifcations/Notifications';
 import { Metadata } from 'next';
 
@@ -6,5 +7,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-    return <Notifications />;
+    const notifications = await listNotifications();
+
+    return <Notifications initialNotifications={notifications} />;
 }

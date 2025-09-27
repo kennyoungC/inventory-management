@@ -1,22 +1,14 @@
 'use server';
 
 import { z } from 'zod';
-import dbConnect from '../db';
-import Restaurant, { RestaurantDto } from '../models/restaurants';
 import bcrypt from 'bcrypt';
 import { auth } from 'auth';
-import type { MongoDuplicateError, RestaurantModel } from '../types';
+import Restaurant, { RestaurantDto } from '@/models/restaurants';
+import type { MongoDuplicateError } from '../types';
+import dbConnect from '../db';
 
-type valueName =
-    | 'restaurantName'
-    | 'email'
-    | 'phoneNumber'
-    | 'accessCode'
-    | 'address'
-    | 'emailUpdates'
-    | 'general'
-    | 'password'
-    | 'confirmPassword';
+type RestaurantInput = z.infer<typeof FormSchema>;
+type ValueName = keyof RestaurantInput;
 
 const fieldNameMap: Record<string, string> = {
     restaurant_name: 'restaurantName',
@@ -28,10 +20,10 @@ const fieldNameMap: Record<string, string> = {
 };
 
 export type State = {
-    errors?: Partial<Record<valueName, string[]>>;
+    errors?: Partial<Record<ValueName, string[]>>;
     success?: boolean;
     message?: string;
-    values?: Partial<Record<valueName, string>>;
+    values?: Partial<Record<ValueName, string>>;
 } | null;
 
 const FormSchema = z
@@ -55,6 +47,7 @@ const FormSchema = z
             .trim(),
         confirmPassword: z.string().min(1, 'Please confirm your password'),
         address: z.string().min(1, 'Address is required').trim(),
+        general: z.string().optional(),
     })
     .refine(data => data.password === data.confirmPassword, {
         message: "Passwords don't match",
@@ -68,6 +61,7 @@ const UpdateProfileSchema = z.object({
     address: z.string().min(1, 'Address is required').trim(),
     emailUpdates: z.preprocess(val => val === 'on' || val === true, z.boolean()),
 });
+
 export async function createRestaurant(prevState: State, formData: FormData): Promise<State> {
     const data = Object.fromEntries(formData.entries());
 
@@ -160,39 +154,6 @@ export async function createRestaurant(prevState: State, formData: FormData): Pr
     }
 }
 
-export async function getRestaurantById(): Promise<RestaurantModel | null> {
-    try {
-        await dbConnect();
-        const session = await auth();
-        const restaurantId = session?.user?.id;
-        if (!restaurantId) return null;
-
-        const restaurant = await Restaurant.findById(restaurantId).lean<RestaurantDto>();
-
-        if (!restaurant) return null;
-        return {
-            id: restaurant._id.toString(),
-            restaurantName: restaurant.restaurant_name,
-            email: restaurant.email,
-            phoneNumber: String(restaurant.phone_number),
-            accessCode: String(restaurant.access_code),
-            address: restaurant.address,
-            emailUpdates: restaurant.email_updates,
-        };
-    } catch (error) {
-        console.error('Error in getRestaurantById:', error);
-        return null;
-    }
-}
-
-export async function getRestaurantByEmail(email: string) {
-    await dbConnect();
-    const user = await Restaurant.findOne({
-        email,
-    }).select('+password');
-    return user;
-}
-
 export async function updateRestaurantProfile(
     prevState: State,
     formData: FormData,
@@ -217,8 +178,6 @@ export async function updateRestaurantProfile(
             return { message: 'Not authorized', errors: { general: ['Not authorized'] } };
 
         const { restaurantName, email, phoneNumber, address, emailUpdates } = validateFields.data;
-
-        console.log({ emailUpdates });
 
         const existing = await Restaurant.findOne({ email }).lean<RestaurantDto>();
 

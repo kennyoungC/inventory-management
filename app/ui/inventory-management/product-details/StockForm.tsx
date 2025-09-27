@@ -4,7 +4,7 @@ import { StockHistoryState } from '@/actions/stock-history';
 import Inputs from '@/components/Inputs';
 import TextAreaInput from '@/components/TextArea';
 import type { SectionType } from '@/types/index';
-import { getOneWeekFromToday } from '@/utils/formatDate';
+import { getOneWeekFromToday } from 'app/shared/utils/dateUtils';
 
 type StockFormProps = {
     entryType: SectionType;

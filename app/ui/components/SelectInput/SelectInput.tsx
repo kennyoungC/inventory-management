@@ -1,4 +1,4 @@
-import { SelectOption } from '@/utils/measureUnits';
+import { SelectOption } from '@/types/measureUnits';
 import React, { CSSProperties } from 'react';
 import Select, { GroupBase, StylesConfig } from 'react-select';
 
@@ -14,7 +14,7 @@ const groupBadgeStyles: CSSProperties = {
     color: '#172B4D',
     display: 'inline-block',
     fontSize: 12,
-    fontWeight: 'normal',
+    fontWeight: 'inventory',
     lineHeight: '1',
     minWidth: 1,
     padding: '0.16666666666667em 0.5em',

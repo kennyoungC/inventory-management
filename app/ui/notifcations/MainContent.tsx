@@ -1,37 +1,45 @@
 'use client';
-import jsonData from '@/utils/data.json';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import NotificationListItem from './NotificationListItem';
 import EmptyState from './EmptyState';
 import NotificationDetails from './NotificationDetails';
+import type { NotificationModel } from 'app/lib/types';
+import { deleteNotification, markNotificationAsRead } from 'app/lib/actions/notification.actions';
 
-const MainContent = () => {
+type Props = {
+    initialNotifications: NotificationModel[];
+};
+
+const MainContent = ({ initialNotifications }: Props) => {
+    console.log('Initial Notifications:', initialNotifications);
+
     const [showNotificationDetails, setShowNotificationDetails] = useState(false);
-    const [selectedNotification, setSelectedNotification] = useState<number | null>(null);
+    const [selectedNotification, setSelectedNotification] = useState<string | null>(null);
 
-    const [notificationsList, setNotificationsList] = useState(jsonData);
-    const handleMarkAsRead = (id: number) => {
-        setNotificationsList(prevNotifications =>
-            prevNotifications.map(notification =>
-                notification.id === id ? { ...notification, isRead: true } : notification,
-            ),
-        );
+    const handleMarkAsRead = async (id: string) => {
+        await markNotificationAsRead(id);
     };
-    const handleDeleteNotification = (id: number, e: React.MouseEvent) => {
+
+    const handleCloseDetails = () => {
+        setShowNotificationDetails(false);
+        setSelectedNotification(null);
+    };
+
+    const handleDeleteNotification = async (id: string, e: React.MouseEvent) => {
         e.stopPropagation();
-        setNotificationsList(prevNotifications =>
-            prevNotifications.filter(notification => notification.id !== id),
-        );
+        await deleteNotification(id);
+
         if (selectedNotification === id) {
-            setShowNotificationDetails(false);
-            setSelectedNotification(null);
+            handleCloseDetails();
         }
     };
 
-    const selectedNotificationDetails = selectedNotification
-        ? notificationsList.find(notification => notification.id === selectedNotification)
-        : null;
+    const selectedNotificationDetails = useMemo(() => {
+        return selectedNotification
+            ? initialNotifications.find(notification => notification.id === selectedNotification)
+            : null;
+    }, [selectedNotification, initialNotifications]);
     return (
         <main className="flex-1 overflow-hidden flex">
             <div
@@ -39,8 +47,8 @@ const MainContent = () => {
             >
                 {/* Notifications List */}
                 <div className="space-y-4 py-10">
-                    {notificationsList.length > 0 ? (
-                        notificationsList.map(notification => (
+                    {initialNotifications.length > 0 ? (
+                        initialNotifications.map(notification => (
                             <NotificationListItem
                                 key={notification.id}
                                 notification={notification}
@@ -61,7 +69,7 @@ const MainContent = () => {
             {showNotificationDetails && selectedNotificationDetails && (
                 <NotificationDetails
                     selectedNotificationDetails={selectedNotificationDetails}
-                    setShowNotificationDetails={setShowNotificationDetails}
+                    handleCloseDetails={handleCloseDetails}
                     handleMarkAsRead={handleMarkAsRead}
                     handleDeleteNotification={handleDeleteNotification}
                 />
