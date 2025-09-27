@@ -7,6 +7,7 @@ export function toNotificationModel(doc: NotificationDto): NotificationModel {
         restaurantId: doc.restaurant_id.toString(),
         title: doc.title,
         message: doc.message,
+        summary: doc.summary,
         type: doc.type,
         isRead: doc.is_read,
         isUrgent: doc.is_urgent,

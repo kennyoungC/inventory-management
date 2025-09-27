@@ -4,7 +4,7 @@ import { createProduct } from '@/actions/product.actions';
 import Inputs from '@/components/Inputs';
 import SelectInput from '@/components/SelectInput/SelectInput';
 import TextAreaInput from '@/components/TextArea';
-import { measurementUnitsGrouped, SelectOption } from '@/utils/measureUnits';
+import { measurementUnitsGrouped, SelectOption } from '@/types/measureUnits';
 import { useActionState, useEffect, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
 
@@ -143,6 +143,7 @@ const CreateNewProduct = ({ onClose, supplierOptions }: Props) => {
                             label="Additional Notes"
                             placeholder="Enter any additional notes about the product..."
                             defaultValue={state?.values?.additionalNotes ?? ''}
+                            error={state?.errors?.additionalNotes?.[0] ?? ''}
                         />
                         {/* SUPPLIER */}
                         <div className="border-t border-gray-200 mt-8 pt-6">

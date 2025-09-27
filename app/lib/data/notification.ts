@@ -16,3 +16,22 @@ export async function listNotifications(): Promise<NotificationModel[]> {
 
     return docs.map(toNotificationModel);
 }
+
+export async function getNotificationCount(): Promise<number> {
+    await dbConnect();
+    const session = await auth();
+    const restaurantId = session?.user?.id;
+    if (!restaurantId) return 0;
+
+    return Notification.countDocuments({ restaurant_id: restaurantId, is_read: false });
+}
+
+export async function clearNotifications() {
+    await dbConnect();
+    const session = await auth();
+    const restaurantId = session?.user?.id;
+    if (!restaurantId) return { success: false, message: 'Unauthorized' };
+
+    const result = await Notification.deleteMany({ restaurant_id: restaurantId });
+    return { success: true, deletedCount: result.deletedCount || 0 };
+}

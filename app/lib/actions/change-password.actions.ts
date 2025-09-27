@@ -2,9 +2,9 @@
 
 import { z } from 'zod';
 import bcrypt from 'bcrypt';
-import dbConnect from '../db';
-import Restaurant from '../models/restaurants';
 import { auth } from 'auth';
+import Restaurant from '@/models/restaurants';
+import dbConnect from '../db';
 
 type PasswordChangeState = {
     errors?: {

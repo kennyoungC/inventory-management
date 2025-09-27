@@ -1,9 +1,10 @@
 'use server';
 
-import { sendContactUsEmail } from '@/utils/sendContactUsEmail';
 import { z } from 'zod';
+import { sendContactUsEmail } from 'app/shared/utils';
 
-type ValueName = 'name' | 'email' | 'message' | 'general';
+type ContactInput = z.infer<typeof ContactSchema>;
+type ValueName = keyof ContactInput;
 
 export type ContactFormServerState = {
     errors?: Partial<Record<ValueName, string[]>>;
@@ -16,6 +17,7 @@ const ContactSchema = z.object({
     name: z.string().min(2, 'Name is required'),
     email: z.string().email('Provide a valid email'),
     message: z.string().min(10, 'Message is too short').max(500),
+    general: z.string().optional(),
 });
 
 export async function handleContactForm(

@@ -10,7 +10,8 @@ export interface NotificationDto extends Document {
     type: NotificationType;
     is_read: boolean;
     is_urgent: boolean;
-    context_url?: string;
+    context_url: string;
+    summary: string;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -32,6 +33,11 @@ const NotificationSchema = new Schema<NotificationDto>(
             type: String,
             required: [true, 'Please provide a message for this notification.'],
             maxlength: [1000, 'Message cannot be more than 1000 characters'],
+        },
+        summary: {
+            type: String,
+            required: [true, 'Please provide a summary for this notification.'],
+            maxlength: [1000, 'Summary cannot be more than 1000 characters'],
         },
         type: {
             type: String,

@@ -14,7 +14,7 @@ import {
 import CreateNewProduct from './CreateNewProduct';
 import Link from 'next/link';
 import { ProductModel, supplierModel } from '@/types/index';
-import { prettyCategory } from '@/utils/getInitials';
+import { prettyCategory } from 'app/shared/utils/textUtils';
 
 const categories = [
     { label: 'All Items', icon: null, id: 'all' },

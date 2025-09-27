@@ -1,6 +1,8 @@
 import StockHistory from '@/models/stock-history';
 import { createNotification } from '@/actions/notification.actions';
-import { generateAiNotification } from './generateAiNotification';
+import { generateAiNotification } from 'app/shared/utils/generateAiNotification';
+import { NotificationTitle } from '@/types/index';
+import { shouldSendExpiry } from 'app/shared/utils/dateUtils';
 
 type HandleNotificationsArgs = {
     productId: string;
@@ -13,26 +15,6 @@ type HandleNotificationsArgs = {
     currentStock: number;
     minimumLevel: number;
 };
-
-/** --- Utility Helpers --- **/
-
-function shouldSendLowStock(
-    currentStock: number,
-    totalStock: number,
-    minLevel: number,
-    isFirstStock: boolean,
-) {
-    return !isFirstStock && currentStock >= minLevel && totalStock < minLevel;
-}
-
-function shouldSendExpiry(expirationDate?: Date | null) {
-    if (!expirationDate) return null;
-    const now = Date.now();
-    const daysUntil = Math.ceil((expirationDate.getTime() - now) / (1000 * 60 * 60 * 24));
-    return daysUntil >= 0 && daysUntil <= 2 ? daysUntil : null;
-}
-
-/** --- Main Handler --- **/
 
 export async function handleNotifications({
     productId,
@@ -49,32 +31,34 @@ export async function handleNotifications({
     const isFirstStock =
         currentStock === 0 && (await StockHistory.countDocuments({ product_id: productId })) === 0;
 
-    /** 🔔 Low Stock Notifications */
     if (
-        shouldSendLowStock(currentStock, totalStock, minimumLevel, isFirstStock) ||
+        (!isFirstStock && currentStock >= minimumLevel && totalStock < minimumLevel) ||
         totalStock === 0
     ) {
         await createNotification({
             restaurantId,
-            title: 'Inventory Low Stock',
-            message: `${productName} is low on stock. Current stock: ${totalStock} ${measurementUnit}.`,
+            title: NotificationTitle.InventoryLowStock,
             type: 'inventory',
-            isUrgent: totalStock === 0 || totalStock < minimumLevel,
+            isUrgent: totalStock < minimumLevel,
             contextUrl,
+            summary: `${productName} is low on stock.`,
+            message: `${productName} is low on stock. Current stock: ${totalStock} ${measurementUnit}.`,
         });
 
         // Generate AI reorder draft (throttled to once per 24h)
-        await generateAiNotification({ productId, restaurantId, contextUrl });
+        if ((entryType === 'removal' && totalStock < minimumLevel) || totalStock === 0) {
+            await generateAiNotification({ productId, restaurantId, contextUrl });
+        }
     }
 
-    /** ⏳ Expiration Notifications */
     if (entryType === 'addition') {
         const daysUntil = shouldSendExpiry(expirationDate);
         if (daysUntil !== null) {
             await createNotification({
                 restaurantId,
-                title: 'Inventory Expiring Soon',
+                title: NotificationTitle.InventoryExpiringSoon,
                 message: `${productName} will expire in ${daysUntil} day${daysUntil === 1 ? '' : 's'}. Current stock: ${totalStock} ${measurementUnit}.`,
+                summary: `${productName} will expire in ${daysUntil} day${daysUntil === 1 ? '' : 's'}.`,
                 type: 'inventory',
                 isUrgent: daysUntil <= 2,
                 contextUrl,

@@ -1,4 +1,4 @@
-import { SelectOption } from '@/utils/measureUnits';
+import { SelectOption } from '@/types/measureUnits';
 import React, { CSSProperties } from 'react';
 import Select, { GroupBase, StylesConfig } from 'react-select';
 

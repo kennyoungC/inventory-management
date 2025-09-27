@@ -1,7 +1,7 @@
 import { StockHistoryDto } from '@/models/stock-history';
 import { StockEntry, StockHistoryModel } from '../types';
-import { generateExpiredLabel } from '@/utils/generateExpiredLabel';
-import { formatDate } from '@/utils/formatDate';
+import { formatDate } from 'app/shared/utils/dateUtils';
+import { generateExpiredLabel } from 'app/shared/utils/textUtils';
 
 export function transformStockHistory(dto: StockHistoryDto[]): StockHistoryModel[] {
     return dto.map(item => ({

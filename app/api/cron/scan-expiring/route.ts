@@ -1,5 +1,5 @@
+import { scanExpiringBatchesAndNotify } from 'app/cronjob';
 import { NextResponse } from 'next/server';
-import { scanExpiringBatchesAndNotify } from 'app/utils/scanExpiringBatches';
 
 export const runtime = 'nodejs';
 

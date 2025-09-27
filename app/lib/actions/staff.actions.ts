@@ -1,14 +1,14 @@
 'use server';
 
-import { sendAccessCodeEmail } from '@/utils/sendAccessCodeEmail';
 import dbConnect from '../db';
 import Staff, { StaffDto } from '@/models/staffs';
 import { z } from 'zod';
 import { auth } from 'auth';
 import { revalidatePath } from 'next/cache';
 import type { MongoDuplicateError, StaffModel } from '../types';
-import { generateUniqueCode } from 'app/utils/generateCode';
-import { MapMongoDuplicateError } from '@/utils/mongoDuplicateError';
+import { generateUniqueCode } from 'app/shared/utils/codeGenerators';
+import { MapMongoDuplicateError } from 'app/shared/utils/mongoDuplicateError';
+import { sendAccessCodeEmail } from 'app/shared/utils/mailUtils';
 
 type StaffInput = z.infer<typeof FormSchema>;
 type ValueName = keyof StaffInput;

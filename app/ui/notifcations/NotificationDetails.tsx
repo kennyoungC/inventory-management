@@ -1,4 +1,5 @@
 'use client';
+import parse from 'html-react-parser';
 
 import {
     FaBell,
@@ -10,17 +11,18 @@ import {
     FaTrashAlt,
 } from 'react-icons/fa';
 import type { NotificationModel } from 'app/lib/types';
+import Link from 'next/link';
 
 type Props = {
     selectedNotificationDetails: NotificationModel;
-    setShowNotificationDetails: (show: boolean) => void;
+    handleCloseDetails: () => void;
     handleMarkAsRead: (id: string) => void;
     handleDeleteNotification: (id: string, e: React.MouseEvent) => void;
 };
 
 const NotificationDetails = ({
     selectedNotificationDetails,
-    setShowNotificationDetails,
+    handleCloseDetails,
     handleMarkAsRead,
     handleDeleteNotification,
 }: Props) => {
@@ -41,7 +43,7 @@ const NotificationDetails = ({
                 <div className="flex items-center justify-between p-6">
                     <h2 className="text-xl font-bold text-gray-800">Notification Details</h2>
                     <button
-                        onClick={() => setShowNotificationDetails(false)}
+                        onClick={handleCloseDetails}
                         className="text-gray-400 hover:text-gray-600 transition-colors duration-200 cursor-pointer"
                     >
                         <FaTimes />
@@ -74,7 +76,9 @@ const NotificationDetails = ({
                         </div>
                     </div>
                     <div className="bg-gray-50 rounded-xl p-4 mb-6">
-                        <p className="text-gray-800">{selectedNotificationDetails.message}</p>
+                        <p className="text-gray-800">
+                            {parse(selectedNotificationDetails.message)}
+                        </p>
                     </div>
                     <div className="bg-gray-50 rounded-xl p-4 mb-6">
                         <h4 className="text-sm font-medium text-gray-600 mb-3">
@@ -106,13 +110,13 @@ const NotificationDetails = ({
                         </div>
                     </div>
                     <div className="space-y-3">
-                        <a
-                            href="#"
+                        <Link
+                            href={selectedNotificationDetails.contextUrl}
                             className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 !rounded-button whitespace-nowrap cursor-pointer flex items-center justify-center gap-2"
                         >
                             <FaExternalLinkAlt />
                             <span>Go to Related Page</span>
-                        </a>
+                        </Link>
                         <button
                             onClick={() => handleMarkAsRead(selectedNotificationDetails.id)}
                             disabled={selectedNotificationDetails.isRead}

@@ -1,23 +1,25 @@
 'use server';
 
-import StockHistory from '@/models/stock-history';
-import Product, { ProductDto } from '@/models/product';
-import { generateEntryId } from '@/utils/generateCode';
-import dbConnect from '../db';
-import { auth } from 'auth';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
-import { generateBatchId } from '@/utils/batchId';
-import { getCodeSession } from '../session';
-import { handleNotifications } from '@/utils/handleNotification';
+import StockHistory from '@/models/stock-history';
+import Product, { ProductDto } from '@/models/product';
+import {
+    generateBatchId,
+    handleNotifications,
+    validateAuthentication,
+    generateEntryId,
+} from 'app/shared/utils';
+import dbConnect from '../db';
 
 type StockHistoryInput = z.infer<typeof StockHistorySchema>;
 type ValueName = keyof StockHistoryInput;
+type DataType = Partial<Record<ValueName, string>>;
 export type StockHistoryState = {
     errors?: Partial<Record<ValueName, Array<string>>>;
     success?: boolean;
     message?: string;
-    values?: Partial<Record<ValueName, string>>;
+    values?: DataType;
 } | null;
 
 const StockHistorySchema = z
@@ -60,7 +62,7 @@ export async function createStockEntry(
     _prevState: StockHistoryState,
     formData: FormData,
 ): Promise<StockHistoryState> {
-    const data = Object.fromEntries(formData.entries()) as Partial<Record<ValueName, string>>;
+    const data = Object.fromEntries(formData.entries());
 
     const validateFields = StockHistorySchema.safeParse(data);
 
@@ -68,35 +70,21 @@ export async function createStockEntry(
         return {
             errors: validateFields.error.flatten().fieldErrors,
             message: 'Validation failed',
-            values: data as Partial<Record<ValueName, string>>,
+            values: data,
         };
     }
 
-    const {
-        entryType,
-        productId,
-        quantity,
-        additionalNotes,
-        reason,
-        expirationDate,
-        currentStock,
-        measurementUnit,
-    } = validateFields.data;
+    const { entryType, productId, quantity, expirationDate, currentStock, measurementUnit } =
+        validateFields.data;
 
     try {
-        const [session, codeSession] = await Promise.all([auth(), getCodeSession()]);
-        const restaurantId = session?.user.id;
-
-        if (!restaurantId) {
-            return { errors: { general: ['Authentication required'] }, message: 'Not authorized' };
-        }
+        const { restaurantDetails } = await validateAuthentication();
         await dbConnect();
-
-        const entryId = generateEntryId();
-        const batchId = await generateBatchId(entryType, restaurantId, productId);
 
         const stockChange = entryType === 'addition' ? quantity : -quantity;
         const totalStock = currentStock + stockChange;
+
+        console.log({ totalStock });
 
         if (entryType === 'removal' && totalStock < 0) {
             return {
@@ -105,46 +93,19 @@ export async function createStockEntry(
             };
         }
 
-        await StockHistory.create({
-            entry_id: entryId,
-            restaurant_id: restaurantId,
-            product_id: productId,
-            stock_created_by: codeSession?.id,
-            created_by_model: session.user.role === 'admin' ? 'Restaurant' : 'Staff',
-            entry_type: entryType,
-            entry_date: new Date(),
-            quantity: Math.abs(quantity),
-            measurement_unit: measurementUnit,
-            batch_id: batchId,
-            additional_notes: additionalNotes ?? '',
-            previous_stock: currentStock,
-            new_stock: totalStock,
-            reason: reason ?? '',
-            expiration_date: entryType === 'addition' && expirationDate ? expirationDate : null,
-        });
-        const productDoc = await Product.findByIdAndUpdate(
-            productId,
-            { current_stock_level: totalStock },
-            { new: true, select: 'name minimum_stock_level' },
-        ).lean<ProductDto>();
+        const { productDoc } = await executeStockTransaction(validateFields.data, totalStock);
 
-        if (productDoc) {
-            try {
-                await handleNotifications({
-                    productId,
-                    restaurantId,
-                    productName: productDoc.name,
-                    totalStock,
-                    measurementUnit,
-                    entryType,
-                    expirationDate,
-                    currentStock,
-                    minimumLevel: productDoc.minimum_stock_level,
-                });
-            } catch (err) {
-                console.error('Notification error:', err);
-            }
-        }
+        await handleNotifications({
+            productId,
+            restaurantId: restaurantDetails.id,
+            productName: productDoc.name,
+            totalStock,
+            measurementUnit,
+            entryType,
+            expirationDate,
+            currentStock,
+            minimumLevel: productDoc.minimum_stock_level,
+        });
 
         revalidatePath(`/dashboard/inventory-management/product-details/${productId}`);
         return {
@@ -157,5 +118,74 @@ export async function createStockEntry(
             errors: { general: ['Failed to process stock entry'] },
             message: 'An error occurred',
         };
+    }
+}
+
+async function executeStockTransaction(validatedData: StockHistoryInput, totalStock: number) {
+    const {
+        entryType,
+        productId,
+        quantity,
+        additionalNotes,
+        reason,
+        expirationDate,
+        currentStock,
+        measurementUnit,
+    } = validatedData;
+
+    const { restaurantDetails, session, codeSession } = await validateAuthentication();
+
+    const connection = await dbConnect();
+    const mongoSession = await connection.connection.startSession();
+
+    try {
+        const result = await mongoSession.withTransaction(async () => {
+            const entryId = generateEntryId();
+            const batchId = await generateBatchId(entryType, restaurantDetails.id, productId);
+
+            const [stockHistoryEntry] = await StockHistory.create(
+                [
+                    {
+                        entry_id: entryId,
+                        restaurant_id: restaurantDetails.id,
+                        product_id: productId,
+                        stock_created_by: codeSession?.id,
+                        created_by_model: session.user.role === 'admin' ? 'Restaurant' : 'Staff',
+                        entry_type: entryType,
+                        entry_date: new Date(),
+                        quantity: Math.abs(quantity),
+                        measurement_unit: measurementUnit,
+                        batch_id: batchId,
+                        additional_notes: additionalNotes?.trim() ?? '',
+                        previous_stock: currentStock,
+                        new_stock: totalStock,
+                        reason: reason?.trim() ?? '',
+                        expiration_date:
+                            entryType === 'addition' && expirationDate ? expirationDate : null,
+                    },
+                ],
+                { session: mongoSession },
+            );
+
+            const productDoc = await Product.findByIdAndUpdate(
+                productId,
+                { current_stock_level: totalStock },
+                {
+                    new: true,
+                    select: 'name minimum_stock_level',
+                    session: mongoSession,
+                },
+            ).lean<ProductDto>();
+
+            if (!productDoc) {
+                throw new Error('Product not found or update failed');
+            }
+
+            return { stockHistoryEntry, productDoc };
+        });
+
+        return result;
+    } finally {
+        await mongoSession.endSession();
     }
 }

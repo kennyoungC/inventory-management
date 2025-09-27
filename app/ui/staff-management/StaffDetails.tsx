@@ -1,4 +1,4 @@
-import { formatDate } from '@/utils/formatDate';
+import { formatDate } from 'app/shared/utils/dateUtils';
 import { FaEdit, FaEnvelope, FaTimes } from 'react-icons/fa';
 import DeleteStaffButton from './DeleteStaffButton';
 import ResetButton from './ResetButton';

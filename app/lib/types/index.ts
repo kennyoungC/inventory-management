@@ -135,6 +135,12 @@ export type LabelStatus = 'Expired' | 'Expiring soon' | 'Valid';
 
 export type NotificationType = 'ai_agent' | 'inventory';
 
+export enum NotificationTitle {
+    DraftReorderEmail = 'Draft Reorder Email',
+    InventoryLowStock = 'Inventory Low Stock',
+    InventoryExpiringSoon = 'Inventory Expiring Soon',
+}
+
 export interface NotificationModel {
     id: string;
     restaurantId: string;
@@ -143,7 +149,8 @@ export interface NotificationModel {
     type: NotificationType;
     isRead: boolean;
     isUrgent: boolean;
-    createdAt: Date;
+    createdAt: Date | string;
     updatedAt: Date;
-    contextUrl?: string;
+    summary: string;
+    contextUrl: string;
 }

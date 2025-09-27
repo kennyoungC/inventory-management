@@ -35,3 +35,10 @@ export const getOneWeekFromToday = (): string => {
     today.setDate(today.getDate() + 7);
     return today.toISOString().split('T')[0];
 };
+
+export const shouldSendExpiry = (expirationDate?: Date | null) => {
+    if (!expirationDate) return null;
+    const now = Date.now();
+    const daysUntil = Math.ceil((expirationDate.getTime() - now) / (1000 * 60 * 60 * 24));
+    return daysUntil >= 0 && daysUntil <= 2 ? daysUntil : null;
+};

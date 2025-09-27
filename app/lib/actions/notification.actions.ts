@@ -1,6 +1,10 @@
-import dbConnect from '../db';
-import Notification, { NotificationType } from '@/models/notifications';
+'use server';
+
+import { revalidatePath } from 'next/cache';
 import { auth } from 'auth';
+import Notification, { NotificationType } from '@/models/notifications';
+import { toNotificationModel } from '../transformers';
+import dbConnect from '../db';
 
 type CreateNotificationArgs = {
     restaurantId: string;
@@ -9,12 +13,14 @@ type CreateNotificationArgs = {
     type: NotificationType;
     isUrgent?: boolean;
     contextUrl?: string;
+    summary?: string;
 };
 
 export async function createNotification({
     restaurantId,
     title,
     message,
+    summary,
     type,
     isUrgent = false,
     contextUrl,
@@ -24,6 +30,7 @@ export async function createNotification({
         restaurant_id: restaurantId,
         title,
         message,
+        summary,
         type,
         is_urgent: isUrgent,
         context_url: contextUrl,
@@ -43,7 +50,8 @@ export async function markNotificationAsRead(id: string) {
         { is_read: true },
     );
     if (!updated) return { success: false, message: 'Notification not found' };
-    return { success: true, data: updated };
+    revalidatePath('/dashboard/notifications');
+    return { success: true, data: toNotificationModel(updated) };
 }
 
 export async function deleteNotification(id: string) {
@@ -56,5 +64,6 @@ export async function deleteNotification(id: string) {
     if (result.deletedCount === 0) {
         return { success: false, message: 'Notification not found' };
     }
+    revalidatePath('/dashboard/notifications');
     return { success: true, data: result };
 }

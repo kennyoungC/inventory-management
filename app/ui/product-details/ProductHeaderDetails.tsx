@@ -1,7 +1,7 @@
 'use client';
 
 import { ProductWithSupplierModel, supplierModel } from '@/types/index';
-import { capitalizeFirstLetter, prettyCategory } from '@/utils/getInitials';
+import { capitalizeFirstLetter, prettyCategory } from 'app/shared/utils/textUtils';
 import { FaEdit, FaWineGlass } from 'react-icons/fa';
 import DeleteButton from './DeleteButton';
 import { useState } from 'react';

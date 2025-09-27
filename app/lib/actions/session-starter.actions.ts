@@ -5,10 +5,10 @@ import dbConnect from '../db';
 import Restaurant from '@/models/restaurants';
 import Staff from '@/models/staffs';
 import { clearCodeSession, createCodeSession } from '../session';
-import { generateUniqueCode } from '@/utils/generateCode';
-import { sendAccessCodeEmail } from '@/utils/sendAccessCodeEmail';
+import { generateUniqueCode } from 'app/shared/utils/codeGenerators';
 import { z } from 'zod';
 import { auth } from 'auth';
+import { sendAccessCodeEmail } from 'app/shared/utils/mailUtils';
 
 type State = {
     error?: string;

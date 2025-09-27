@@ -4,8 +4,8 @@ import { authConfig } from './auth.config';
 
 import bcrypt from 'bcrypt';
 
-import { getRestaurantByEmail } from './app/lib/actions/restaurant.action';
 import { createCodeSession } from 'app/lib/session';
+import { getRestaurantByEmail } from '@/data/restaurant';
 
 declare module 'next-auth' {
     interface User {

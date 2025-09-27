@@ -1,4 +1,4 @@
-import Staff from '../lib/models/staffs';
+import Staff from '../../lib/models/staffs';
 
 export async function generateUniqueCode(): Promise<number> {
     const MIN = 100000;

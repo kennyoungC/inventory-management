@@ -6,7 +6,7 @@ import SupplierInformation from './SupplierInformation';
 import { getAllSuppliers } from '@/data/supplier';
 import { getProductWithSupplier } from '@/data/product';
 import { getAllStockHistory } from '@/data/stock-history';
-import { getCurrentSessionUser } from '@/actions/current-session-user.actions';
+import { getCurrentSessionUser } from '@/data/session';
 
 const MainContent = async ({ productId }: { productId: string }) => {
     const [productWithSupplier, suppliers, stockHistory, currentUser] = await Promise.all([

@@ -8,5 +8,6 @@ export const metadata: Metadata = {
 
 export default async function Page() {
     const notifications = await listNotifications();
+
     return <Notifications initialNotifications={notifications} />;
 }

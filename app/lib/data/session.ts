@@ -1,7 +1,7 @@
 import { getCodeSession } from 'app/lib/session';
-import Staff from 'app/lib/models/staffs';
-import Restaurant from 'app/lib/models/restaurants';
 import dbConnect from 'app/lib/db';
+import Restaurant from '@/models/restaurants';
+import Staff from '@/models/staffs';
 
 export async function getCurrentSessionUser() {
     const codeSession = await getCodeSession();

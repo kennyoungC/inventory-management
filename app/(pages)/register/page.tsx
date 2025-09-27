@@ -89,6 +89,7 @@ export default function Register() {
                                 type="number"
                                 label="Quick Access Code"
                                 name="accessCode"
+                                maxLength={6}
                                 placeholder="Enter your quick access code"
                                 error={state?.errors?.accessCode?.[0]}
                                 defaultValue={state?.values?.accessCode}
