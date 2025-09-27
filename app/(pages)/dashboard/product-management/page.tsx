@@ -1,6 +1,6 @@
-import ProductManagement from 'app/ui/product-management/ProductManagement';
 import React from 'react';
 import { Metadata } from 'next';
+import ProductManagement from '@/ui/product-management/ProductManagement';
 
 export const metadata: Metadata = {
     title: 'Product Management',

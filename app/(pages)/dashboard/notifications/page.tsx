@@ -1,6 +1,6 @@
-import { listNotifications } from '@/data/notification';
-import Notifications from 'app/ui/notifcations/Notifications';
 import { Metadata } from 'next';
+import { listNotifications } from '@/data/notification';
+import Notifications from '@/ui/notifcations/Notifications';
 
 export const metadata: Metadata = {
     title: 'Notifications',

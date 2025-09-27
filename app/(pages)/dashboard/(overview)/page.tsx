@@ -1,5 +1,5 @@
-import Dashboard from '../../ui/dashboard/Dashboard';
 import { Metadata } from 'next';
+import Dashboard from '@/ui/dashboard/Dashboard';
 
 export const metadata: Metadata = {
     title: 'Dashboard',

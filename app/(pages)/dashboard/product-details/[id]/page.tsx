@@ -1,4 +1,4 @@
-import ProductDetails from 'app/ui/product-details/ProductDetails';
+import ProductDetails from '@/ui/product-management/product-details/ProductDetails';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {

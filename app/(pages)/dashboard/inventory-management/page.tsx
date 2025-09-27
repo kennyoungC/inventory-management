@@ -1,4 +1,4 @@
-import InventoryManagement from 'app/ui/inventory-management/InventoryManagement';
+import InventoryManagement from '@/ui/inventory-management/InventoryManagement';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
