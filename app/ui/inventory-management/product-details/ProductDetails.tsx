@@ -14,7 +14,7 @@ type Props = {
     productId: string;
 };
 
-const ProductDetails = async ({ productId }: Props) => {
+const InventoryProductDetails = async ({ productId }: Props) => {
     const productWithSupplier = await getProductWithSupplier(productId);
 
     const { additions, removals } = await getStockHistoryCardData(productId);
@@ -84,4 +84,4 @@ const ProductDetails = async ({ productId }: Props) => {
     );
 };
 
-export default ProductDetails;
+export default InventoryProductDetails;

@@ -2,7 +2,7 @@ import HeaderBar from 'app/shared/components/HeaderBar';
 import MainContent from './MainContent';
 import { Toaster } from 'react-hot-toast';
 
-const ProductDetails = ({ productId }: { productId: string }) => {
+const ProductManagementProductDetails = ({ productId }: { productId: string }) => {
     return (
         <>
             <HeaderBar title="Product Management System" />
@@ -18,4 +18,4 @@ const ProductDetails = ({ productId }: { productId: string }) => {
     );
 };
 
-export default ProductDetails;
+export default ProductManagementProductDetails;
