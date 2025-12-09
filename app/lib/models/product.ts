@@ -1,6 +1,6 @@
-import { Schema, model, models, Document } from 'mongoose';
+import { Schema, model, models,  } from 'mongoose';
 
-export interface ProductDto extends Document {
+export interface ProductDto  {
     _id: Schema.Types.ObjectId;
     name: string;
     sku: string;

@@ -2,7 +2,6 @@
 
 import dbConnect from '../db';
 import Staff, { StaffDto } from '@/models/staffs';
-import { z } from 'zod';
 import { auth } from 'auth';
 import { revalidatePath } from 'next/cache';
 import type { MongoDuplicateError, StaffModel } from '../types';
@@ -22,6 +21,9 @@ export type State = {
 const fieldNameMap: Record<string, string> = {
     email: 'email',
 };
+
+import { z } from 'zod';
+
 const FormSchema = z.object({
     email: z.string().email({ message: 'Please enter a valid email.' }).trim(),
     jobTitle: z.string().min(1, 'Job title is required').trim(),

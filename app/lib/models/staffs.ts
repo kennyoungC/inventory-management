@@ -1,7 +1,7 @@
-import { Schema, model, models, Document } from 'mongoose';
+import { Schema, model, models } from 'mongoose';
 import validator from 'validator';
 
-export interface StaffDto extends Document {
+export interface StaffDto  {
     _id: Schema.Types.ObjectId;
     restaurant_id: Schema.Types.ObjectId;
     full_name: string;

@@ -5,7 +5,7 @@ import NextAuth from 'next-auth';
 import { getCodeSession } from './app/lib/session';
 
 const { auth } = NextAuth(authConfig);
-export default auth(async function middleware(req: NextRequest) {
+export default auth(async function proxy(req: NextRequest) {
     const pathname = req.nextUrl.pathname;
 
     const session = await auth();

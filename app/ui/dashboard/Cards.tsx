@@ -2,12 +2,14 @@ import { fetchCardData } from '@/data/dashboard';
 import { FaBandAid, FaInbox } from 'react-icons/fa';
 import { FaClock, FaCodePullRequest } from 'react-icons/fa6';
 
-// const iconMap = {
-//     collected: FaBandAid,
-//     customers: FaCodePullRequest,
-//     pending: FaClock,
-//     invoices: FaInbox,
-// };
+type CardProps = {
+    title: string;
+    value: number | string;
+    unit?: string;
+    icon: React.ComponentType<{ className?: string }>;
+    iconColor?: string;
+    iconBgColor?: string;
+};
 
 export default async function CardWrapper() {
     const { totalProducts, totalActiveSuppliers, numberOfLowStock, numberOfOutOfStock } =
@@ -27,16 +29,16 @@ export default async function CardWrapper() {
                 value={totalActiveSuppliers}
                 unit="item(s)"
                 icon={FaClock}
-                iconColor="text-yellow-600"
-                iconBgColor="bg-yellow-100"
+                iconColor="text-green-600"
+                iconBgColor="bg-green-100"
             />
             <DashboardCard
                 title="Low Stock Products"
                 value={numberOfLowStock}
                 unit="item(s)"
                 icon={FaInbox}
-                iconColor="text-green-600"
-                iconBgColor="bg-green-100"
+                iconColor="text-yellow-600"
+                iconBgColor="bg-yellow-100"
             />
             <DashboardCard
                 title="Out of Stock Products"
@@ -49,14 +51,7 @@ export default async function CardWrapper() {
         </>
     );
 }
-type CardProps = {
-    title: string;
-    value: number | string;
-    unit?: string;
-    icon: React.ComponentType<{ className?: string }>;
-    iconColor?: string; // e.g. text-blue-500
-    iconBgColor?: string; // e.g. bg-blue-100
-};
+
 export function DashboardCard({
     title,
     value,

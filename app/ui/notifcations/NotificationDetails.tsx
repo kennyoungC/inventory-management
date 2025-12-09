@@ -13,6 +13,8 @@ import {
 import type { NotificationModel, NotificationType } from 'app/lib/types';
 import Link from 'next/link';
 
+// TODO: SHOW open link for only admin
+
 type Props = {
     selectedNotificationDetails: NotificationModel;
     handleCloseDetails: () => void;
@@ -75,6 +77,7 @@ const NotificationDetails = ({
                             </p>
                         </div>
                     </div>
+
                     <div className="bg-gray-50 rounded-xl p-4 mb-6">
                         <p className="text-gray-800">
                             {parse(selectedNotificationDetails.message)}

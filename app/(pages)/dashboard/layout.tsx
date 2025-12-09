@@ -1,5 +1,8 @@
 import SideBar from 'app/shared/components/SideBar';
 
+//TODO: INVESTIGATE WHY THIS IS NEEDED
+export const dynamic = 'force-dynamic';
+
 export default function Layout({ children }: { children: React.ReactNode }) {
     return (
         <div className="flex h-screen flex-col md:flex-row md:overflow-hidden relative">
