@@ -1,7 +1,7 @@
-import { Schema, model, models, Document } from 'mongoose';
+import { Schema, model, models } from 'mongoose';
 import { SectionType } from '../types';
 
-export interface StockHistoryDto extends Document {
+export interface StockHistoryDto  {
     restaurant_id: Schema.Types.ObjectId;
     stock_created_by: Schema.Types.ObjectId;
     created_by_model: 'Staff' | 'Restaurant';

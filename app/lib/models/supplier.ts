@@ -1,7 +1,7 @@
-import { model, models, Schema, Document } from 'mongoose';
+import { model, models, Schema } from 'mongoose';
 import validator from 'validator';
 
-export interface SupplierDto extends Document {
+export interface SupplierDto  {
     _id: Schema.Types.ObjectId;
     supplier_name: string;
     supplier_contact_person?: string;

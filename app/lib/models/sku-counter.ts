@@ -1,7 +1,7 @@
 // models/SkuCounter.ts
-import { Schema, model, models, Document } from 'mongoose';
+import { Schema, model, models } from 'mongoose';
 
-interface SkuCounterDto extends Document {
+interface SkuCounterDto  {
     category: string;
     lastSequence: number;
     restaurant_id: Schema.Types.ObjectId;

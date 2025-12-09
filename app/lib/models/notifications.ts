@@ -1,8 +1,8 @@
-import { Schema, model, models, Document } from 'mongoose';
+import { Schema, model, models, } from 'mongoose';
 
 export type NotificationType = 'ai_agent' | 'inventory';
 
-export interface NotificationDto extends Document {
+export interface NotificationDto {
     _id: Schema.Types.ObjectId;
     restaurant_id: Schema.Types.ObjectId;
     title: string;
